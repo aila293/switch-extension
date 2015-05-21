@@ -1,0 +1,56 @@
+<html>
+  
+<head>
+    <title>Keyboard</title>
+    <style>
+        body {
+/*            width: 800px;*/
+            word-wrap: break-word;
+        }
+        .key {
+            font-size: 30px;
+            display: inline-block;
+            height: 40px;
+            width: 40px;
+            border: solid black;
+            text-align: center;
+            margin: 1px;
+        }
+        .key:focus{
+            color: red;
+        }
+        button#top {
+            display: none; /*if the frame starts at the top*/
+        }  
+        #space {
+            font-size: 14px;
+        }
+        .section:focus, button:focus{
+            border: solid red 3px;
+        }
+        
+    </style>
+    
+    <script src="keyboard.js"></script>  
+    <script src="jquery-1.11.3.min.js"></script>
+
+</head>
+  
+<body>
+    <div id='keyboard'>
+        <div class="section" id="letters_sect" tabindex='1'></div>
+        <div class="section" id="others_sect"></div> 
+        <div class="section" id="buttons_sect" tabindex='50'>
+            <button type='button' id='submit' tabindex='51'>Submit text</button>
+            <button type='button' id='close' tabindex='52'>Close Keyboard</button>
+            <button type='button' id='top' class='move' tabindex='53'>Move to Top</button>
+            <button type='button' id='bottom' class='move' tabindex='54'>Move to Bottom</button>
+            <button type='button' id='caps' tabindex='55'>Capital Letters</button>
+        </div>
+    </div>
+<!--    <div class="section" id="capitals_sect" tabindex='35'></div>-->
+
+</body>
+
+</html>
+

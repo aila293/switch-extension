@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+
+  "name": "Extension",
+  "description": "",
+  "version": "1.0",
+
+  "background": {
+    "scripts": ["jquery-1.11.3.min.js", "background.js"]
+  }, 
+
+  /*"browser_action": {
+    //"default_icon": "icon.png",
+    "default_popup": "popup.html",
+    "default_title": "Click here!"
+  },*/
+    
+  "permissions": [
+    "activeTab", 
+    "https://ajax.googleapis.com/"
+  ],
+    
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"], //any http or https
+      "js": ["jquery-1.11.3.min.js", "controls.js", "keyboard.js"]
+    }
+  ],
+  "web_accessible_resources": [
+     "*.html" //change to keyboard.html
+  ]
+}
