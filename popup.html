@@ -1,0 +1,51 @@
+<!doctype html>
+
+<!--
+ This page is shown when the extension button is clicked, because the
+ "browser_action" field in manifest.json contains the "default_popup" key with
+ value "popup.html".
+ -->
+
+<html>
+  
+<head>
+    <title>Keyboard PopUp</title>
+    <style>
+        body {
+            width: 800px;
+            word-wrap: break-word;
+        }
+        #key {
+            font-size: 30px;
+            display: inline-block;
+            height: 80px;
+            width: 80px;
+            border: solid black;
+            text-align: center;
+            margin: 1px;
+        }
+        span:focus{
+            color: red;
+        }
+        #text{
+            font-size: 40px;
+        }
+        
+    </style>
+
+    
+    <script src="keyboard.js"></script>  
+    <script src="jquery-1.11.3.min.js"></script>
+
+</head>
+  
+<body>
+    <!-- <div id="status"></div>  
+    <img id="image-result" hidden> --> 
+    
+    <div id="keyboard"></div>
+    <div id="text"></div>
+</body>
+
+</html>
+
