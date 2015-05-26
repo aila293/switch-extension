@@ -23,10 +23,10 @@
   "content_scripts": [
     {
       "matches": ["*://*/*"], //any http or https
-      "js": ["jquery-1.11.3.min.js", "controls.js", "keyboard.js"]
+      "js": ["jquery-1.11.3.min.js", "controls.js", "keyboard.js", "panel.js"]
     }
   ],
   "web_accessible_resources": [
-     "*.html" //change to keyboard.html
+     "*.html" //change to keyboard.html + panel.html
   ]
 }

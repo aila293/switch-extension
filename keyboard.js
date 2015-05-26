@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('.letter').first().focus(); //assume you want a letter after selecting 'caps'
             } else {
                 window.parent.postMessage(button_id, "*")
-                //id = 'close', 'submit'
+                // id = 'close' keyboard, 'submit' text
+                // scroll 'up', scroll 'down', 'next' link, 'open' keyboard
             }
         }
     });
@@ -89,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
             //type into own textbox
             var txt_field = $('#text');
             var val = txt_field.val(); 
-
             if ($(':focus').text()==='backspace'){
                 val = val.substring(0,val.length-1);
             } else {
