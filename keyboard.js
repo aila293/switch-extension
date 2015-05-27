@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 window.parent.postMessage(button_id, "*")
                 // id = 'close' keyboard, 'submit' text
-                // scroll 'up', scroll 'down', 'next' link, 'open' keyboard
             }
         }
     });
@@ -108,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         if (message === 'open'){
-           // resetFocus(); //prevents typing with keyboard 
+           // resetFocus(); //prevents my typing with keyboard 
         }
     });
 
