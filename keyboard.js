@@ -6,7 +6,7 @@ var capitals = ['E','T','A','O','I','N','S','H','R','D','L','U','C','M','F','W',
 
 function loadKeys(){
     for (var i=0;i<letters.length;i++){
-        $("#letters_sect").append("<span class='key letter' tabindex='"+(i+2)+"'>"+letters[i]+"</span>"); //tab starts at 2 (1 for section)
+        $("#letters_sect").append("<span class='key letter' tabindex='"+(i+2)+"'>"+letters[i]+"</span>"); //tab starts at 2 (1 is the section)
     }   
     
     $('#others_sect').attr('tabindex', [letters.length+2]);
@@ -14,13 +14,10 @@ function loadKeys(){
         $("#others_sect").append("<span class='key other' tabindex='"+(i+letters.length+3)+"'>"+others[i]+"</span>");
     }   
     
-    //create label for 'space' key
-    //$('.other').first().attr('id', "space");
     labelKey(0, 'space');
     labelKey(2, 'newline');
     
-    //set id for backspace key for styling (smaller font)
-    $('.other')[1].id = "backspace";
+    $('.other')[1].id = "backspace"; //set id for styling (font)
 }
 
 function labelKey(index, name){ //for 'other' keys that need different content/appearance. index = place in 'other' array

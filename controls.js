@@ -112,28 +112,6 @@ function dockKeyboard(){
     window.onresize(); 
 }
 
-//alternative docking using body wrapper
-/*
-function dockKeyboard(){ 
-//dock using body wrapper. 
-// Remove previous appendChild(keyboard). 
-// Change scope of 'var keyboard'
-
-    if ($('#my_body_wrapper').length !== 0){
-        return;
-    }
-    var div = document.createElement('div');
-    div.id='my_body_wrapper';
-    div.style.overflow='scroll';
-    $('body').wrapInner(div);
-    
-     window.onresize = function (){
-     $('#my_body_wrapper').height(window.innerHeight - 240);
-    };
-    document.body.appendChild(keyboard);
-}
-*/
-
 function closeKeyboard(){
     $("#keyboard-frame").hide();
     document.body.style.overflow = ''; //undocks this space
@@ -150,8 +128,8 @@ function injectPanel(){
         "background-color: rgba(255,255,255, 0.9);",
         "position: fixed;",
         "width: 600px;",
-        "height: 50px;",
-        "bottom: 30px;",
+        "height: 40px;",
+        "bottom: 10px;",
         "left: 40%;", 
         "border: solid black 3px;"
         //add style rules for iframe here
@@ -161,22 +139,38 @@ function injectPanel(){
     for (var i=0;i<style.length;i++){
         style_txt += style[i];
     }    
-    panel.style.cssText = style_txt;   
-    
-    //add class to show which link is selected
+    panel.style.cssText = style_txt;    
+}
+
+function injectMyStyles(){
+    // which link is selected
     var my_link_class = document.createElement('style');
     my_link_class.type = 'text/css';
     my_link_class.textContent = ".currently-selected-link {border: solid blue 3px !important;}";
     document.head.appendChild(my_link_class);  
     
+    // which text field is selected
     var my_text_class = document.createElement('style');
     my_text_class.type = 'text/css';
     my_text_class.textContent = ".active-text-field {border: solid orange 3px !important;}";
-    document.head.appendChild(my_text_class);  
+    document.head.appendChild(my_text_class); 
+    
+    //where the link sections are
+    var my_section_class = document.createElement('style');
+    my_section_class.type = 'text/css';
+    my_section_class.textContent = ".conceptual-section {border: solid purple 6px !important;}";
+    document.head.appendChild(my_section_class); 
+    
+     var my_sub_section_class = document.createElement('style');
+    my_sub_section_class.type = 'text/css';
+    my_sub_section_class.textContent = ".conceptual-sub-section {border: solid hotpink 6px !important;}";
+    document.head.appendChild(my_sub_section_class); 
 }
 
 document.addEventListener("DOMContentLoaded", injectKeyboard(), false);
 document.addEventListener("DOMContentLoaded", injectPanel(), false);
+document.addEventListener("DOMContentLoaded", injectMyStyles(), false);
+document.addEventListener("DOMContentLoaded", mapDOM(), false);
 
 function scrollWindow(direction){
     var scroll = $(document).scrollTop();
@@ -311,9 +305,114 @@ window.addEventListener("message", function(event){
     }
 }, false);
 
-
 function mapDOM(){
+    $('header').has('a').addClass('conceptual-section');
+    $('footer').has('a').addClass('conceptual-section');
+    $('aside').has('a').addClass('conceptual-section');
     
+    $('nav').has('a').each(function(){
+        if ($(this).closest('.conceptual-section').length == 0){
+        //if it isn't inside a header/footer/aside already marked
+            $(this).addClass('conceptual-section');
+        }
+    });
+    
+    $('ol, ul').has('a').each(function(){
+        if ($(this).closest('.conceptual-section').length == 0){
+            $(this).addClass('conceptual-section');
+        }
+    });
+    
+    $('table').has('a').each(function(){
+        if ($(this).closest('.conceptual-section').length == 0){
+            $(this).addClass('conceptual-section');
+        }
+    });
+    
+    $('article').has('a').each(function(){
+        if ($(this).closest('.conceptual-section').length == 0){
+            $(this).addClass('conceptual-section');
+        }
+    });
+    
+    $('p').has('a').each(function(){
+        if ($(this).closest('.conceptual-section').length == 0){
+            $(this).addClass('conceptual-section');
+        }
+    });
+    
+    //catch all the rest of the links
+    $( "a:first-of-type" ).each(function(){
+        if ($(this).closest('.conceptual-section').length == 0){
+            $(this).parent().addClass('conceptual-section');
+        }
+    });
+    
+    //remove any overlaps
+    $( ".conceptual-section" ).each(function(){
+        if ($(this).parents('.conceptual-section').length != 0){
+            $(this).removeClass('conceptual-section');
+        }
+    });
+    
+    //consolidate single-link sections that are part of a nested patterns of links (e.g. "div a")
+     $( ".conceptual-section" ).each(function(){
+        if ($(this).find('a').length == 1){ 
+            
+            var parent = $(this).parent(); 
+            var grandparent = parent.parent(); 
+            
+            var type = parent[0].tagName.toLowerCase();
+            if (grandparent.children(type).children('.conceptual-section').length > 1){
+                grandparent.addClass('conceptual-section');
+                grandparent.find('.conceptual-section').removeClass('conceptual-section');
+                //return; //inside jquery each(), equivalent to "continue to next iteration"
+            }
+            
+        }
+    });    
+    
+    mapSections();
+}
+
+function mapSections(){  //later, will take 1 section (or subsection?) as argument
+                                //instead of taking subsection, switch  classes
+
+    $('.conceptual-section').each(function(){
+        var links = $(this).find('a');
+        if (links.length < 6){
+            //tab through links   
+        } else {
+            var sections = $(this).children().has('a');
+            
+            while (sections.length != links.length){ //can't be greater
+                if (sections.length == 1){  //only one child: try next level
+                    sections = sections.children().has('a');
+                } else {
+                     sections.addClass('conceptual-sub-section');
+                    
+                    //catch stray links not in those sections
+//                    links.each(function(){
+//                        if ($(this).closest('.conceptual-sub-section').length==0){
+//                            $(this).addClass('conceptual-sub-section');
+//                        }
+//                    });
+                     break;
+                }
+            }
+            //if sections.length == num_links, tab through
+        }
+    });
+    
+    //reduce sub-sections with 1 link to just that link
+//            $('.conceptual-sub-section').each(function(){
+//                if ($(this).find('a').length ==1){
+//                    $(this).removeClass('.conceptual-sub-section');
+//                    $(this).find('a').addClass('.conceptual-sub-section');
+//                } 
+//            });   
+    
+    //artificially break long (many links) sections (e.g. W3schools)
 }
 
 /*
@@ -324,8 +423,7 @@ Can't see any text field that requires scrolling:
 
 To do:
 -access non-text input areas
--hierarchical navigation
-    -find lowest-level div/nav/header/footer with >1 link
+-hierarchical navigation of links
 
 -email sites don't work
 -docking overlaps on some sites (KhanAcademy / Youtube)
@@ -361,33 +459,5 @@ Fix scroll issue:
         -doesn't appear in Google
         -makes Youtube footer stick to wrong place
         -makes every code piece in jQuery disappear
-    -
-
-*/
-
-/* Debugging snippets
-
-log scrollTop of all elements
-    $(document).click(function(){
-        var elements = $('*');
-        for (var i=0;i<elements.length;i++){
-            if (elements[i].scrollTop > 0) {
-                console.log(elements[i]);
-            }
-        }
-        //alert('done');
-    });
-               
-log bounding client rect
-    $('a').click(function(e){
-        e.preventDefault();
-        var dom_link = $(this).get(0);
-        var rect = dom_link.getBoundingClientRect();
-        console.log("left: "+rect.left);
-        console.log("top: "+rect.top);
-        console.log("right: "+rect.right);
-        console.log("bottom: "+rect.bottom);
-        console.log("visible: "+isVisible(dom_link));
-    });
 
 */
