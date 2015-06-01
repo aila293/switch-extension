@@ -344,7 +344,13 @@ function mapDOM(){
     //catch all the rest of the links
     $( "a:first-of-type" ).each(function(){
         if ($(this).closest('.conceptual-section').length == 0){
-            $(this).parent().addClass('conceptual-section');
+            
+            if ($(this).parent()[0].tagName !== "BODY"){
+                $(this).parent().addClass('conceptual-section');
+            } else {
+                $(this).addClass('conceptual-section');
+                console.log(this);
+            }
         }
     });
     
@@ -364,8 +370,11 @@ function mapDOM(){
             
             var type = parent[0].tagName.toLowerCase();
             if (grandparent.children(type).children('.conceptual-section').length > 1){
-                grandparent.addClass('conceptual-section');
-                grandparent.find('.conceptual-section').removeClass('conceptual-section');
+                
+                if (grandparent[0].tagName !== "BODY" && grandparent[0].tagName !== "HTML"){
+                    grandparent.addClass('conceptual-section');
+                    grandparent.find('.conceptual-section').removeClass('conceptual-section');   
+                }
                 //return; //inside jquery each(), equivalent to "continue to next iteration"
             }
             
@@ -423,7 +432,8 @@ Can't see any text field that requires scrolling:
 
 To do:
 -access non-text input areas
--hierarchical navigation of links
+-hierarchical navigation of links  
+    -prevent making 'body' or 'html' a section
 
 -email sites don't work
 -docking overlaps on some sites (KhanAcademy / Youtube)
