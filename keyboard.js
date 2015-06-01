@@ -60,8 +60,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateLetters(); 
                 $('.letter').first().focus(); //assume you want a letter after selecting 'caps'
             } else {
+                resetFocus();
                 window.parent.postMessage(button_id, "*")
-                // id = 'close' keyboard, 'submit' text
+                // id = 'close' keyboard, 'submit' text, "next-input"
             }
         }
     });
@@ -107,8 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         if (message === 'open'){
-           // resetFocus(); //prevents my typing with keyboard 
-        }
+            resetFocus(); 
+        }  
     });
-
 });

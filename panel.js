@@ -1,14 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
-    
+
     $('button').keydown(function(e){
         e.stopPropagation();
         if (e.which===13){ //enter
             var button_id = $(this).attr('id');
              window.parent.postMessage(button_id, "*")
             //scroll 'up', scroll 'down', 'next' link, 'open' keyboard
-             resetFocus();
+             if (button_id !== 'next-link'){
+                 resetFocus();
+            }
+        } else if (e.which === 9){
+            if ($(this)[0] == $('body button').last()[0]){
+                e.preventDefault();
+                resetFocus();
+            }
         }
     });
+    
+   resetFocus(); //start on first button
 });
 
 function resetFocus(){
