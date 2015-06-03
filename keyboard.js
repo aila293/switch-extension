@@ -64,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    
     $('.section').keydown(function(e){
         var focus = $(':focus');
         if (e.which===9){ //tab
@@ -103,7 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     
-    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+     console.log(message);
         if (message === 'open'){
             resetFocus(); 
         }  

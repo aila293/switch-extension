@@ -1,19 +1,13 @@
 {
   "manifest_version": 2,
 
-  "name": "Extension",
+  "name": "Switch Extension",
   "description": "",
-  "version": "1.0",
+  "version": "0.5",
 
   "background": {
     "scripts": ["jquery-1.11.3.min.js", "background.js"]
   }, 
-
-  /*"browser_action": {
-    //"default_icon": "icon.png",
-    "default_popup": "popup.html",
-    "default_title": "Click here!"
-  },*/
     
   "permissions": [
     "activeTab", 
@@ -27,6 +21,6 @@
     }
   ],
   "web_accessible_resources": [
-     "*.html" //change to keyboard.html + panel.html
+     "*.html" //specify keyboard.html + panel.html
   ]
 }

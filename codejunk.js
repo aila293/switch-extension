@@ -1,3 +1,29 @@
+//code for obsolete next-link / select-link buttons
+            // for the event listener switch
+            case 'next-link': nextLink();
+                break;
+            case 'select-link':
+                $('.currently-selected-link')[0].click();
+                break;
+var link_index;
+function nextLink(){
+     if (typeof link_index == 'undefined'){
+        link_index = 0;
+    } else {
+        link_index++;
+    }
+
+    var links = $('a');
+    while (!(isVisible(links[link_index])) ){
+        link_index++; 
+        if (link_index === links.length){link_index=0;} //roll-over
+    }
+    $(".currently-selected-link").removeClass("currently-selected-link");
+    $(links[link_index]).addClass("currently-selected-link");
+    console.log(links[link_index]);
+   // console.log(links[link_index].offsetParent); //returns null for display:none?
+}
+
 
 //Unused snippet for top-level DOM mapping. Looks for twice-nested link patterns ("div div a"). Seems to not make a difference
  var great_grandparent = grandparent.parent(); 
