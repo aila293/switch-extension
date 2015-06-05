@@ -1,6 +1,6 @@
 var letters = ['e','t','a','o','i','n','s','h','r','d','l','u','c','m','f','w','y','p','v','b','g','k','j','q','x','z'];
 
-var others = [' ', 'backspace', '\n', '.', '-', ',', '?', '+','='];
+var others = [' ', 'backspace', '\n', 'clear', '.', '-', ',', '?', '+','='];
 
 var capitals = ['E','T','A','O','I','N','S','H','R','D','L','U','C','M','F','W','Y','P','V','B','G','K','J','Q','X','Z'];
 
@@ -18,6 +18,7 @@ function loadKeys(){
     labelKey(2, 'newline');
     
     $('.other')[1].id = "backspace"; //set id for styling (font)
+    $('.other')[3].id = "clear";
 }
 
 function labelKey(index, name){ //for 'other' keys that need different content/appearance. index = place in 'other' array
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var focus = $(':focus');
         if (e.which===9){ //tab
             e.preventDefault();
-           var next_section = focus.next();
+            var next_section = focus.next();
             if (next_section.length === 0){
                 resetFocus();
             } else {

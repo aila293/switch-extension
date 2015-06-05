@@ -1,7 +1,7 @@
 var text_selector = ":text, textarea, input[role='textbox'], input[type='url'], input[type='email'], input[type='password'], input[type='search'], [contenteditable='true']";
-
+var keyboard;
 function injectKeyboard(){ 
-    var keyboard = document.createElement("iframe"); 
+    keyboard = document.createElement("iframe"); 
     keyboard.id = 'keyboard-frame';
     keyboard.src = chrome.extension.getURL("keyboard.html"); 
 
@@ -12,11 +12,9 @@ function injectKeyboard(){
     
     var style = [
         "display: none;",
-        //"z-index: 100;", 
         "width: 99%;",
         "height: 200px;", 
         "background-color: rgba(255,255,255, 0.9);"
-        //add style rules for iframe here
     ];
     
     var style_txt = "";
@@ -79,14 +77,15 @@ function nextInput(){
     }
 }
 
+var hidden_height = 210;
 function dockKeyboard(){
     document.body.style.overflow = 'inherit';
     
     window.onresize = function (){
-        document.documentElement.style.height = 
-            (window.innerHeight - 210) + 'px';
+        document.body.style.height = 
+            (window.innerHeight - hidden_height) + 'px';
         
-        
+     //attempts to fix docking/sidebar irregularities 
 //        var pos = $('#keyboard-frame').offset();
 //
 //        //works on Youtube, picks a part of the nav bar in KA
@@ -165,20 +164,33 @@ document.addEventListener("DOMContentLoaded", injectPanel(), false);
 document.addEventListener("DOMContentLoaded", injectMyStyles(), false);
 
 function scrollWindow(direction){
-    var scroll = $(document).scrollTop();
-    if (direction === 'up'){
-        scroll -= window.innerHeight*0.8;
+    if (document.getElementById('keyboard-frame').style.display == 'none'){
+        var scroll = $(document).scrollTop();
+        if (direction === 'up'){
+            scroll -= window.innerHeight*0.8;
+        } else {
+            scroll += window.innerHeight*0.8;
+        }
+        $(document).scrollTop(scroll);
     } else {
-        scroll += window.innerHeight*0.8;
+        //attempts to pretend to scroll by moving the body up
+//        document.body.style.position = 'relative';
+//        document.body.style.top = "-100px";
+//        hidden_height -=100;
+//        document.body.style.maxHeight = document.body.style.maxHeight+hidden_height;
+//        //hidden_height -= 100;
+//        window.onresize();
+        
     }
-    $(document).scrollTop(scroll);
 }
 
 function typeToInput(key){
     var val = txt_field.val(); 
     if (key === 'backspace'){
         val = val.substring(0,val.length-1);
-    } else { // letter or ascii character
+    } else if (key === 'clear'){
+        val = '';
+    } else { //letter or character
         val += key;
     }
     txt_field.val(val);
@@ -264,6 +276,15 @@ function nextSection(){
         if (index == list.length){index=0;}
         $(list[index]).addClass('current-sub-section');
     }
+//        addStyle('body', '{opacity: .9;}');
+//        addStyle('.active-section *', '{opacity: 1;}');
+    
+    //scroll to place
+    if ($('.current-sub-section').length>0 && !(isVisible($('.current-sub-section')[0]))){
+        $(document).scrollTop($('.current-sub-section').offset().top - 100);        
+    } else if (!(isVisible($('.active-section')[0]))){
+        $(document).scrollTop($('.active-section').offset().top - 100);
+    }
 
 }
 
@@ -290,37 +311,43 @@ function selectSection(){
                 
 }
 
+function backSection(){
+    //if active-section is a main section
+    if ($('.active-section').is('.conceptual-section')){
+        unmapSection($('.current-sub-section'));
+        $('.current-sub-section').removeClass('current-sub-section');
+    //if active-section is a sub-section
+    }  else {
+        unmapSection($('.active-section'));
+        var one_up = $('.active-section').closest('.conceptual-sub-section:not(.active-section), .conceptual-section').addClass('active-section');
+        one_up.find('.active-section').removeClass('active-section');
+        $('.current-sub-section').removeClass('current-sub-section');
+        $('.active-section').find('.conceptual-sub-section').first().addClass('current-sub-section');
+        unmapSection($('.current-sub-section'));
+    }
+}
+
+function unmapSection(section){
+    section.find('.conceptual-sub-section').removeClass('conceptual-sub-section');
+}
+
 window.addEventListener("message", function(event){
     var my_origin = chrome.extension.getURL("");
     my_origin = my_origin.substring(0, my_origin.length-1); //remove slash at the end
-    
     if (event.origin.indexOf(my_origin) != -1){ 
         switch(event.data){
-                
             //from keyboard iframe
-            case 'submit':
-                var submit = findSubmit();
-                console.log(submit);
-                closeKeyboard();                
-                submit.click();
-                break;
-            case 'close': closeKeyboard();
-                break;
-            case 'next-input': nextInput();
-                break;
-                
+            case 'submit':  closeKeyboard(); findSubmit().click();   break;
+            case 'close': closeKeyboard();  break;
+            case 'next-input': nextInput(); break;
             //from control panel iframe
-            case 'up': case 'down': scrollWindow(event.data);
-                break;
-            case 'open': openKeyboard();
-                break;
- 
-            case 'next-section': nextSection();
-                break;
-            case 'select-section': selectSection();
-                break;
-                
-            default:  // character or backspace from keyboard
+            case 'up': case 'down': scrollWindow(event.data);   break;
+            case 'open': openKeyboard();    break;
+            case 'next-section': nextSection(); break;
+            case 'select-section': selectSection(); break;
+            case 'back-section': backSection(); break;
+            //character from keyboard
+            default:  
                 txt_field.css('opacity', ['1']); //for the Google 'new tab' search box. Doesn't work anyway since this field can't be entered, it's supposed to just redirect to the browser navigation bar
                 typeToInput(event.data);
         }
@@ -328,13 +355,20 @@ window.addEventListener("message", function(event){
 }, false);
 
 function sectionOff(selector){
-    //include items whose ids or classes match the selector
-    $(selector).has('a').each(function(){
+    //include items whose ids or classes match the selector, not just the tagname
+    $(selector+', .'+selector+', #'+selector).has('a:visible').each(function(){
         if ($(this).closest('.conceptual-section').length == 0){
-            //if not inside a section already marked
             $(this).addClass('conceptual-section');            
         }
     });        
+}
+
+function isTooBig(element){
+//    console.log(element.width());
+//    console.log(element.width());
+//    console.log((window.innerWidth*.9));
+    return (element.width() > (window.innerWidth*.9) && element.height()>1000)
+    || element.is('body, html');
 }
 
 function mapDOM(){
@@ -342,6 +376,7 @@ function mapDOM(){
     sectionOff('footer');
     sectionOff('aside');
     sectionOff('nav');
+    sectionOff('section');
     sectionOff('ol, ul');
     sectionOff('table');
     sectionOff('article');
@@ -349,14 +384,12 @@ function mapDOM(){
     sectionOff('p');
     
     //catch all the rest of the links
-    $( "a:first-of-type" ).each(function(){
+    $( "a:first-of-type:visible" ).each(function(){
         if ($(this).closest('.conceptual-section').length == 0){
-            if ($(this).parent().is('body, html')){ //limit by size, not just tag
+            if (isTooBig($(this).parent())){
                 $(this).addClass('conceptual-section'); 
-                //make the link a section
             } else {
-                $(this).parent().addClass('conceptual-section');
-                //make the parent a section
+                $(this).parent().addClass('conceptual-section'); 
             }
         }
     });
@@ -368,35 +401,43 @@ function mapDOM(){
         }
     });
     
-    //consolidate single-link sections that are part of a nested pattern of links (e.g. 2 siblings of "div a")
+    
+    //group 1-link sections that are siblings with other sections
      $( ".conceptual-section" ).each(function(){
-        if ($(this).find('a').length == 1){             
+        if ($(this).find('a:visible').length == 1){             
             var parent = $(this).parent(); 
             if (parent.children('.conceptual-section').length > 1){
-                if (!(parent.is('body, html'))){ //limit size
+                if (!(isTooBig(parent))){ 
                     parent.addClass('conceptual-section');
                     parent.find('.conceptual-section').removeClass('conceptual-section');   
                 }
             }
-            
         }
     });  
     
+        //group single-link sections that are part of a nested pattern of links (e.g. 2 siblings of "div a")
+    $( ".conceptual-section" ).each(function(){
+            var parent = $(this).parent(); 
+            var type = this.tagName;
+            if (parent.children(type+'.conceptual-section').length > 1){
+                if (!(isTooBig(parent))){ 
+                    parent.addClass('conceptual-section');
+                    parent.find('.conceptual-section').removeClass('conceptual-section');   
+                }
+            }
+    });  
+    
+    //two-generation pattern of links
      $( ".conceptual-section" ).each(function(){
-        if ($(this).find('a').length == 1){ 
-            
             var parent = $(this).parent(); 
             var grandparent = parent.parent(); 
-            
             var parent_type = parent[0].tagName.toLowerCase();
             if (grandparent.children(parent_type).children('.conceptual-section').length > 1){
-                if (!(grandparent.is('body, html'))){ //limit size
+                if (!(isTooBig(grandparent))){ 
                     grandparent.addClass('conceptual-section');
                     grandparent.find('.conceptual-section').removeClass('conceptual-section');   
                 }
             }
-            
-        }
     });    
     
     //combine two adjacent sections with few links? or just in sub-sections
@@ -454,24 +495,18 @@ function mapSection(section){  //takes 1 jquery object, can be section || subsec
 }
 
 
+//active-section: element you're moving around in, pink
+//current-sub-section: thing you're about to select
 
 /*
-Can't see any text field that requires scrolling:
-    -opening Keyboard sets body-scrollbar to top
-    -scroll buttons don't work when keyboard open
-    -get around by manually moving the body above the screen?
 
 To do:
 -access non-text input areas
 -hierarchical navigation of links  
-    -exclude links with href=# ?
-    -limit the size of any possible section (i.e. prevent marking a div at or very near the size of the whole body) 
-    -scroll selected section into view
     -selects sections that are hidden/not open
     -put focus back in ctrl panel after clicking link
         -blur handler? load handler?
-    
-
+    -replace border with some kind of highlight of the selected section
 -add browser navigation (open/close tab, type in url)
 
 -deal with inner page reloads/new content
@@ -482,14 +517,6 @@ To do:
     -Chrome 'newtab': appends onto bottom b/c min-height > the maxheight I set
 -more possible selectors for submit buttons
 -links/inputs not visible and don't know why (Kongregate, email)
-
-
-Small additions:
--buttons to change cursor position in text
--tab from last key to first key (keyboard)
--add "clear input" button to keyboard
-
-- doesn't allow Google/Youtube autocomplete
 
 Later:
 - allow user to make custom buttons
