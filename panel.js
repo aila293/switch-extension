@@ -1,17 +1,23 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    $('button').each(function(index){
+       $('button')[index].tabIndex = index+1; 
+    });
+    
     $('button').keydown(function(e){
         e.stopPropagation();
         if (e.which===13){ //enter
             var button_id = $(this).attr('id');
             window.parent.postMessage(button_id, "*")
            
+            //move focus to appropriate button
             if (button_id == 'select-section'){
                 $('#next-section').focus();
             } else if (button_id !== 'next-link' 
                 && button_id !== 'next-section'){
                  resetFocus();
             } 
+            
         } else if (e.which === 9){
             if ($(this)[0] == $('body button').last()[0]){
                 e.preventDefault();

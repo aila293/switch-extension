@@ -25,7 +25,7 @@ function injectKeyboard(){
     document.documentElement.appendChild(keyboard); 
     
     //$('*').focus(function(){ alert($(this).prop("tagName"));});
-    $(text_selector).focus(openKeyboard);
+    //$(text_selector).focus(openKeyboard);
 }
 
 var txt_field; //jQuery object, keep for backup in case the active class is lost?
@@ -128,10 +128,10 @@ function injectPanel(){
         "z-index: 100;", 
         "background-color: rgba(255,255,255, 0.9);",
         "position: fixed;",
-        "width: 600px;",
-        "height: 40px;",
-        "bottom: 10px;",
-        "left: 30%;", 
+        "width: 90%;",
+        "height: 70px;",
+        "bottom: 1px;",
+        "left: 5%;", 
         "border: solid black 3px;"
         //add style rules for iframe here
     ];
@@ -331,29 +331,6 @@ function unmapSection(section){
     section.find('.conceptual-sub-section').removeClass('conceptual-sub-section');
 }
 
-window.addEventListener("message", function(event){
-    var my_origin = chrome.extension.getURL("");
-    my_origin = my_origin.substring(0, my_origin.length-1); //remove slash at the end
-    if (event.origin.indexOf(my_origin) != -1){ 
-        switch(event.data){
-            //from keyboard iframe
-            case 'submit':  closeKeyboard(); findSubmit().click();   break;
-            case 'close': closeKeyboard();  break;
-            case 'next-input': nextInput(); break;
-            //from control panel iframe
-            case 'up': case 'down': scrollWindow(event.data);   break;
-            case 'open': openKeyboard();    break;
-            case 'next-section': nextSection(); break;
-            case 'select-section': selectSection(); break;
-            case 'back-section': backSection(); break;
-            //character from keyboard
-            default:  
-                txt_field.css('opacity', ['1']); //for the Google 'new tab' search box. Doesn't work anyway since this field can't be entered, it's supposed to just redirect to the browser navigation bar
-                typeToInput(event.data);
-        }
-    }
-}, false);
-
 function sectionOff(selector){
     //include items whose ids or classes match the selector, not just the tagname
     $(selector+', .'+selector+', #'+selector).has('a:visible').each(function(){
@@ -494,6 +471,59 @@ function mapSection(section){  //takes 1 jquery object, can be section || subsec
     //artificially break long (many links) sections (e.g. W3schools)
 }
 
+window.addEventListener("message", function(event){
+    var my_origin = chrome.extension.getURL("");
+    my_origin = my_origin.substring(0, my_origin.length-1); //remove slash at the end
+    if (event.origin.indexOf(my_origin) != -1){ 
+        switch(event.data){
+            //from keyboard iframe
+            case 'submit':  closeKeyboard(); findSubmit().click();   break;
+            case 'close': closeKeyboard();  break;
+            case 'next-input': nextInput(); break;
+            //from control panel iframe
+            case 'up': case 'down': scrollWindow(event.data);   break;
+            case 'open': openKeyboard();    break;
+            case 'next-section': nextSection(); break;
+            case 'select-section': selectSection(); break;
+            case 'back-section': backSection(); break;
+            case 'back': window.history.back(); break;
+            case 'forward': window.history.forward(); break;
+                //allow larger view of history
+            case 'snap-window': 
+                break;
+            case 'change-window':
+                break;
+            case 'print':
+                window.print();
+            case 'find':
+                //allow user to input string
+                window.find("string");
+
+            
+                
+            //send to background page- requires chrome.tabs
+            case 'reload': 
+            case 'new-tab':
+            case 'copy-tab':
+            case 'close-tab':
+            case 'close-other-tabs':
+            case 'change-url':
+            case 'change-tab':
+            case 'pin-tab':
+            case 'unpin-tab':
+            case 'move-tab':
+            case 'zoom':
+                chrome.runtime.sendMessage(event.data); 
+                break;
+            
+            //character from keyboard
+            default:  
+                txt_field.css('opacity', ['1']); //for the Google 'new tab' search box. Doesn't work anyway since this field can't be entered, it's supposed to just redirect to the browser navigation bar
+                typeToInput(event.data);
+        }
+    }
+}, false);
+
 
 //active-section: element you're moving around in, pink
 //current-sub-section: thing you're about to select
@@ -503,9 +533,8 @@ function mapSection(section){  //takes 1 jquery object, can be section || subsec
 To do:
 -access non-text input areas
 -hierarchical navigation of links  
-    -selects sections that are hidden/not open
-    -put focus back in ctrl panel after clicking link
-        -blur handler? load handler?
+    -selects sections that are hidden/not accessible
+    -put focus back in ctrl panel after clicking link (blur handler?)
     -replace border with some kind of highlight of the selected section
 -add browser navigation (open/close tab, type in url)
 
@@ -518,8 +547,7 @@ To do:
 -more possible selectors for submit buttons
 -links/inputs not visible and don't know why (Kongregate, email)
 
-Later:
-- allow user to make custom buttons
+Eventually:
 - allow user to pick alternatives to tab/enter
 - make keyboard as json object, use different keyboard layouts
 - allow user to create page-specific buttons for common actions
