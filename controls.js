@@ -166,10 +166,11 @@ document.addEventListener("DOMContentLoaded", injectMyStyles(), false);
 function scrollWindow(direction){
     if (document.getElementById('keyboard-frame').style.display == 'none'){
         var scroll = $(document).scrollTop();
-        if (direction === 'up'){
-            scroll -= window.innerHeight*0.8;
-        } else {
-            scroll += window.innerHeight*0.8;
+        switch(direction){
+            case 'up': scroll -= window.innerHeight*0.8; break;
+            case 'down': scroll += window.innerHeight*0.8; break;
+            case 'top': scroll = 0; break;
+            case 'bottom': scroll = document.body.scrollHeight; break;
         }
         $(document).scrollTop(scroll);
     } else {
@@ -471,55 +472,57 @@ function mapSection(section){  //takes 1 jquery object, can be section || subsec
     //artificially break long (many links) sections (e.g. W3schools)
 }
 
+chrome.runtime.onMessage.addListener( //from the background page
+  function(message, sender, sendResponse) {
+    window.find(message, false, false, true, false, false,true);
+});
+
 window.addEventListener("message", function(event){
     var my_origin = chrome.extension.getURL("");
     my_origin = my_origin.substring(0, my_origin.length-1); //remove slash at the end
+    
     if (event.origin.indexOf(my_origin) != -1){ 
         switch(event.data){
+                
             //from keyboard iframe
             case 'submit':  closeKeyboard(); findSubmit().click();   break;
             case 'close': closeKeyboard();  break;
             case 'next-input': nextInput(); break;
+                
             //from control panel iframe
-            case 'up': case 'down': scrollWindow(event.data);   break;
-            case 'open': openKeyboard();    break;
+            case 'up': case 'down': case 'top': case 'bottom':
+                scrollWindow(event.data);   break;
             case 'next-section': nextSection(); break;
             case 'select-section': selectSection(); break;
             case 'back-section': backSection(); break;
-            case 'back': window.history.back(); break;
-            case 'forward': window.history.forward(); break;
-                //allow larger view of history
-            case 'snap-window': 
-                break;
-            case 'change-window':
-                break;
-            case 'print':
-                window.print();
-            case 'find':
-                //allow user to input string
-                window.find("string");
-
-            
+            case 'open': openKeyboard();    break;
                 
-            //send to background page- requires chrome.tabs
-            case 'reload': 
-            case 'new-tab':
-            case 'copy-tab':
-            case 'close-tab':
-            case 'close-other-tabs':
-            case 'change-url':
-            case 'change-tab':
-            case 'pin-tab':
-            case 'unpin-tab':
-            case 'move-tab':
-            case 'zoom':
+            case 'back': window.history.back(); break; //allow larger view of history
+            case 'forward': window.history.forward(); break;
+//            case 'snap-window': break;
+//            case 'change-window': break;
+//            case 'print': window.print(); break;
+                
+            //send to background page- requires chrome.tabs or chrome.windows ('find')
+            case 'reload': case 'new-tab': case 'close-tab': case 'change-tab': case 'change-url':  
+//            case 'copy-tab': //works
+//            case 'close-other-tabs': //works
+//            case 'pin-tab':
+//            case 'unpin-tab':
+//            case 'move-tab':
+            case 'find': case 'zoom-in': case 'zoom-out': 
                 chrome.runtime.sendMessage(event.data); 
                 break;
             
             //character from keyboard
             default:  
+                if (event.data.length > 1){
+                    console.log(event.data+ " controls");
+                } else {
+                
                 txt_field.css('opacity', ['1']); //for the Google 'new tab' search box. Doesn't work anyway since this field can't be entered, it's supposed to just redirect to the browser navigation bar
                 typeToInput(event.data);
+                }
         }
     }
 }, false);
@@ -530,16 +533,20 @@ window.addEventListener("message", function(event){
 
 /*
 
-To do:
--access non-text input areas
--hierarchical navigation of links  
-    -selects sections that are hidden/not accessible
-    -put focus back in ctrl panel after clicking link (blur handler?)
-    -replace border with some kind of highlight of the selected section
--add browser navigation (open/close tab, type in url)
-
--deal with inner page reloads/new content
-    -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+To do now:
+    -include links + inputs in sections
+    -create settings page: auto-scan off or on, speed
+        -implement auto-scan w/ variable speed
+    -group panel contrls
+        
+To do hopefully:
+    -better styling (sections, focus border, layout, etc.)
+    -deal with inner page reloads/new content
+        -put focus back in ctrl panel (blur handler?)
+        -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+        
+To do later:
+    -implement any other browser/window controls
     
 -email sites don't work
 -docking overlaps on some sites (KhanAcademy / Youtube)
@@ -551,12 +558,11 @@ Eventually:
 - allow user to pick alternatives to tab/enter
 - make keyboard as json object, use different keyboard layouts
 - allow user to create page-specific buttons for common actions
+- refactor/clean code
 
 https://github.com/jjallen37/ChromeFormSwitch
 https://object.io/site/2011/enter-git-flow/
 mousetrap (create keyboard shortcuts) 
-http://www.sitepoint.com/chrome-extensions-bridging-the-gap-between-layers/
-http://www.html5rocks.com/en/tutorials/webcomponents/shadowdom/
 
 Fix scroll issue:
     -wrap body in own div, shorten, append iframe

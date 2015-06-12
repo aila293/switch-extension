@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
    resetFocus(); //start on first button
 
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-         console.log(message);
+//         console.log(message);
         if (message === 'refocus'){
             resetFocus(); 
         }  

@@ -9,6 +9,10 @@
         :focus {
             border: solid red 3px;
         }
+        div {
+            display: inline-block;
+            padding-right: 50px;
+        }
     </style>
     
     <script src="panel.js"></script>  
@@ -17,38 +21,63 @@
 </head>
   
 <body>
-    <button id='down'>Scroll down</button>
-    <button id='up'>Scroll up</button>
-    <button id='next-section'> Next section </button>
-     <button id='select-section'> Select section </button>
-     <button id='back-section'> Go back a section </button>
-    <button id='reload'> Reload page </button>
-    <button id='new-tab'> New tab </button>
-    <button id='close-tab'> Close tab </button>
-    <button id='close-other-tabs'> Close all other tabs </button>
-    <br>
-    <button id='back'> Go back a page </button>
-    <button id='forward'> Go forward a page </button>
-    <button id='find'> Search the page </button>
-    <button id='zoom'> Zoom window </button>
-    <button id='copy-tab'> Duplicate tab </button>
-    <button id='change-url'> Change URL </button>
-    <button id='change-tab'> Change tab </button>
-    <button id='change-window'> Change window </button>
-    <button id='pin-tab'> Pin tab </button>
-    <button id='unpin-tab'> Unpin tab </button>
-    <button id='move-tab'> Move tab </button>
-    <br>
+    <div id='scroll-controls'>
+        <button id='down'>Scroll Down</button>
+        <button id='up'>Scroll Up</button>
+        <button id='top'>Scroll to Top</button>
+        <button id='bottom'>Scroll to Bottom</button>
+    </div>
 
-<!--
-    <button id='next-link' tabindex='5'> Go to next link</button>
-    <button id='select-link' tabindex='6'> Select link</button>
+    <div id= 'interaction-controls'>
+        <button id='next-section'> Next Section </button>
+        <button id='select-section'> Select Section </button>
+        <button id='back-section'> Go Back a Section </button>
+        <button id='open'>Open Keyboard</button>
+    </div>
+    
+    <br>
+    
+    <div id='page-controls'>
+        <button id='change-url'>Change URL</button>
+        <button id='reload'> Reload Page </button>
+        <button id='new-tab'> New Tab </button>
+        <button id='close-tab'> Close Tab </button>
+        <button id='change-tab'> Change Tab </button>
+    </div>
+    
+    <div id='other-controls'>
+        <button id='back'> Back a Page </button>
+        <button id='forward'> Forward a Page </button>
+        <button id='find'> Search the Page </button>
+       <button id='zoom-in'> Zoom In </button>
+        <button id='zoom-out'> Zoom Out </button>
+    </div>
+        
+<!--    
+        <div>
+    //Slightly less useful tab operations
+        <button id='close-other-tabs'> Close all other tabs
+        </button>
+        <button id='copy-tab'> Duplicate tab </button>
+        <button id='pin-tab'> Pin tab </button>
+        <button id='unpin-tab'> Unpin tab </button>
+        <button id='move-tab'> Move tab </button>
+
+    </div>
 -->
-    <button id='open'>Open keyboard</button>
-    <button id='minimize'> Minimize window </button>
-    <button id='snap-window'> Snap window to left? </button>
-    <button id='print'> Print screen </button>
-    <button id='zoom'> Zoom window </button>
+<!--
+//Not useful until ability to snap windows to sides is implemented
+    <div id="window-controls">
+        <button id='open-window'> New window </button>
+        <button id='change-window'> Change window </button>
+        <button id='snap-windows'> Snap windows to sides </button>
+        <button id='minimize'> Minimize window </button>
+    </div>
+-->
+    
+<!--    <button id='print'> Print screen </button>
+    //Can't support navigating the iframe pop-up atm-->
+    
     
 </body>
 
