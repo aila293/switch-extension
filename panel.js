@@ -1,33 +1,52 @@
-document.addEventListener('DOMContentLoaded', function() {
-
-    $('button').each(function(index){
-       $('button')[index].tabIndex = index+1; 
+function setTabIndex(){
+    var i =1;
+    $('button,div').each(function(index){
+       this.tabIndex = i++; 
     });
+}
+
+function setFirstSectionFocus(){$('div').first().focus();}
+function setNextSectionFocus(div){$(div).next().focus();};
+function setParentFocus(button){$(button).parent().focus();}
+function setChildFocus(div){$(div).children().first().focus();}
+function setFirstSiblingFocus(button){$(button).parent().children().first().focus();}
+ 
+
+document.addEventListener('DOMContentLoaded', function() {
+//window.addEventListener('load', function() {
+
+    setTabIndex();
     
     $('button').keydown(function(e){
         e.stopPropagation();
-        if (e.which===13){ //enter
-            var button_id = $(this).attr('id');
-            window.parent.postMessage(button_id, "*")
-           
-            //move focus to appropriate button
-            if (button_id == 'select-section'){
-                $('#next-section').focus();
-            } else if (button_id !== 'next-link' 
-                && button_id !== 'next-section'){
-                 resetFocus();
-            } 
-            
-        } else if (e.which === 9){
-            if ($(this)[0] == $('body button').last()[0]){
+        if (e.which===13){  //enter
+            window.parent.postMessage(this.id, "*")
+            setFirstSiblingFocus(this);
+        } else if (e.which === 9){  //tab   
+            if ($(this).next().length == 0){ //if last button in section
                 e.preventDefault();
-                resetFocus();
+                setParentFocus(this);
             }
         }
     });
     
-   resetFocus(); //start on first button
-
+    $('div').keydown(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        
+        if (e.which===13){ //enter
+            setChildFocus(this);
+        } else if (e.which === 9){ //tab
+            if ($(this).next().length == 0){
+                setFirstSectionFocus();
+            } else {
+                setNextSectionFocus(this);
+            }            
+        }
+    });
+    
+    setFirstSectionFocus();
+    
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 //         console.log(message);
         if (message === 'refocus'){
@@ -35,9 +54,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }  
     });
 });
-
-function resetFocus(){
-    $('button').first().focus();
-}
-
- 

@@ -24,7 +24,6 @@ function injectKeyboard(){
     keyboard.style.cssText = style_txt;    
     document.documentElement.appendChild(keyboard); 
     
-    //$('*').focus(function(){ alert($(this).prop("tagName"));});
     //$(text_selector).focus(openKeyboard);
 }
 
@@ -128,7 +127,7 @@ function injectPanel(){
         "z-index: 100;", 
         "background-color: rgba(255,255,255, 0.9);",
         "position: fixed;",
-        "width: 90%;",
+        "width: 80%;",
         "height: 70px;",
         "bottom: 1px;",
         "left: 5%;", 
@@ -170,7 +169,7 @@ function scrollWindow(direction){
             case 'up': scroll -= window.innerHeight*0.8; break;
             case 'down': scroll += window.innerHeight*0.8; break;
             case 'top': scroll = 0; break;
-            case 'bottom': scroll = document.body.scrollHeight; break;
+            case 'bottom': scroll = document.body.scrollHeight; break;                
         }
         $(document).scrollTop(scroll);
     } else {
@@ -490,7 +489,7 @@ window.addEventListener("message", function(event){
             case 'next-input': nextInput(); break;
                 
             //from control panel iframe
-            case 'up': case 'down': case 'top': case 'bottom':
+            case 'up': case 'down': case 'top': case 'bottom': case 'custom':
                 scrollWindow(event.data);   break;
             case 'next-section': nextSection(); break;
             case 'select-section': selectSection(); break;
@@ -503,30 +502,28 @@ window.addEventListener("message", function(event){
 //            case 'change-window': break;
 //            case 'print': window.print(); break;
                 
-            //send to background page- requires chrome.tabs or chrome.windows ('find')
-            case 'reload': case 'new-tab': case 'close-tab': case 'change-tab': case 'change-url':  
-//            case 'copy-tab': //works
-//            case 'close-other-tabs': //works
-//            case 'pin-tab':
-//            case 'unpin-tab':
-//            case 'move-tab':
-            case 'find': case 'zoom-in': case 'zoom-out': 
+            //send to background page- requires chrome.tabs or chrome.windows
+            case 'reload': case 'new-tab': case 'close-tab': case 'change-tab': case 'change-url': case 'find': case 'zoom-in': case 'zoom-out': case 'settings':
+//            case 'copy-tab': case 'close-other-tabs': case 'pin-tab': case 'unpin-tab': case 'move-tab':
                 chrome.runtime.sendMessage(event.data); 
                 break;
             
             //character from keyboard
             default:  
-                if (event.data.length > 1){
-                    console.log(event.data+ " controls");
-                } else {
-                
                 txt_field.css('opacity', ['1']); //for the Google 'new tab' search box. Doesn't work anyway since this field can't be entered, it's supposed to just redirect to the browser navigation bar
                 typeToInput(event.data);
-                }
         }
     }
 }, false);
 
+
+/*  Questions 
+    -can I get to the omnibox / address bar?
+    -is there a better way to detect if a page is https or http
+    -how will it interact with the user's preexisting keyboard
+
+
+*/
 
 //active-section: element you're moving around in, pink
 //current-sub-section: thing you're about to select
@@ -535,10 +532,10 @@ window.addEventListener("message", function(event){
 
 To do now:
     -include links + inputs in sections
-    -create settings page: auto-scan off or on, speed
+    -custom scroll amount 
+    -create settings page: 
         -implement auto-scan w/ variable speed
-    -group panel contrls
-        
+                
 To do hopefully:
     -better styling (sections, focus border, layout, etc.)
     -deal with inner page reloads/new content
@@ -546,8 +543,10 @@ To do hopefully:
         -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
         
 To do later:
-    -implement any other browser/window controls
+    -all other browser/window controls
+    -connect the "search" function with link selection
     
+Ongoing issues:
 -email sites don't work
 -docking overlaps on some sites (KhanAcademy / Youtube)
     -Chrome 'newtab': appends onto bottom b/c min-height > the maxheight I set
@@ -555,7 +554,6 @@ To do later:
 -links/inputs not visible and don't know why (Kongregate, email)
 
 Eventually:
-- allow user to pick alternatives to tab/enter
 - make keyboard as json object, use different keyboard layouts
 - allow user to create page-specific buttons for common actions
 - refactor/clean code

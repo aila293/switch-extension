@@ -49,7 +49,7 @@ function changeTab(){
 }
 
 var browser_tabs;
-chrome.runtime.onMessage.addListener( //button_ids from the content script
+chrome.runtime.onMessage.addListener( //button_ids from the content script (panel.js)
     function(message, sender, sendResponse) {
         switch(message){
             //relay to iframes
@@ -62,12 +62,11 @@ chrome.runtime.onMessage.addListener( //button_ids from the content script
             
             //use chrome.tabs
             case 'reload': chrome.tabs.reload(); break;
-            case 'new-tab': chrome.tabs.create({}); break;
+            case 'new-tab': chrome.tabs.create({url: "https://www.google.com"}); break;
             case 'copy-tab': getActiveTab(duplicate); break;
             case 'close-tab': getActiveTab(remove); break;
             case 'close-other-tabs': getAllTabs(closeOther); break;
             case 'change-url':
-                //allow user to set url
                 chrome.windows.create({'url': 'popup.html', 'width': 500, 'height': 110, 'type': 'popup'}, function(window) {}); 
                 break;
             case 'change-tab': changeTab(); break;
@@ -77,11 +76,18 @@ chrome.runtime.onMessage.addListener( //button_ids from the content script
             case 'zoom-in': case 'zoom-out': zoom(message); break;
             case 'find':
                 chrome.windows.create({'url': 'popup.html', 'width': 300, 'height': 110, 'type': 'popup'}, function(window) {}); 
-                break;                
+                break;
+            case 'settings':
+                var settings_url = "chrome-extension://"+ chrome.runtime.id + "/options.html";
+                chrome.tabs.query({active: true}, function(tabs){
+                 chrome.tabs.update(tabs[0].id, {url: settings_url}, function(tab){});
+                });
+                //chrome.runtime.openOptionsPage(); opens chrome://extensions, which isn't accessible
+                break;
       }
   });
 
-//information from the popup page
+//information from the popup page, sent through controls.js
 window.addEventListener("message", function(event){
     //tab_id for which tab to switch to
     switch(event.data[0]){
@@ -100,8 +106,6 @@ window.addEventListener("message", function(event){
         case 'change-url':
             chrome.tabs.query({active: true}, function(tabs){
                 chrome.tabs.update(tabs[0].id, {url: event.data[1]}, function(tab){
-//                    console.log(tab.url);
-//                    console.log(event.data[1]);
                     if (tab.url != (event.data[1]+"/")){ //detect if https didn't work
                         var new_url = event.data[1].replace("https://www.", "http://www.");
                         chrome.tabs.update(tabs[0].id, {url: new_url});

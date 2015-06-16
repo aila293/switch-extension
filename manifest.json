@@ -1,27 +1,36 @@
-{
-  "manifest_version": 2,
-
-  "name": "Switch Extension",
-  "description": "",
-  "version": "0.5",
-
-  "background": {
-    "scripts": ["jquery-1.11.3.min.js", "background.js"]
-  }, 
-    
-  "permissions": [
-    "activeTab", 
-    "https://ajax.googleapis.com/",
-    "tabs"
-  ],
-    
-  "content_scripts": [
     {
-      "matches": ["*://*/*"], //any http or https
-      "js": ["jquery-1.11.3.min.js", "controls.js", "keyboard.js", "panel.js"]
+    "manifest_version": 2,
+
+    "name": "Switch Extension",
+    "description": "",
+    "version": "0.5",
+
+    "background": {
+        "scripts": ["jquery-1.11.3.min.js", "background.js"]
+    }, 
+
+    "permissions": [
+        "activeTab", 
+        "https://ajax.googleapis.com/",
+        "tabs", 
+        "storage"
+    ],
+
+    "content_scripts": [
+        {
+        //"matches": ["*://*/*"], //any http or https, outdated?
+        "matches": ["<all_urls>"],
+            
+        "js": ["jquery-1.11.3.min.js", "controls.js", "keyboard.js", "panel.js"]
+        }
+    ],
+
+    "web_accessible_resources": [
+        "*.html" //specify own html pages (keyboard, panel) later
+    ],
+
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true //recommended by Chrome
     }
-  ],
-  "web_accessible_resources": [
-     "*.html" //specify keyboard.html + panel.html
-  ]
 }

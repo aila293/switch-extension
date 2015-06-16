@@ -6,12 +6,12 @@
         body {
             word-wrap: break-word;
         }
-        :focus {
-            border: solid red 3px;
-        }
         div {
             display: inline-block;
-            padding-right: 50px;
+            margin-right: 70px;
+        }
+        :focus {
+            border: solid red 3px !important;
         }
     </style>
     
@@ -24,22 +24,29 @@
     <div id='scroll-controls'>
         <button id='down'>Scroll Down</button>
         <button id='up'>Scroll Up</button>
-        <button id='top'>Scroll to Top</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button id='bottom'>Scroll to Bottom</button>
+        <button id='top'>Scroll to Top</button>
+<!--        <button id='custom'> Custom Scroll </button>-->
     </div>
 
     <div id= 'interaction-controls'>
         <button id='next-section'> Next Section </button>
         <button id='select-section'> Select Section </button>
         <button id='back-section'> Go Back a Section </button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button id='open'>Open Keyboard</button>
+        <button id='settings'> Extension Settings </button>
     </div>
     
-    <br>
+<!--    <br> --> 
+    <!--    messes up the "next" function for section tabbing --> 
+
     
     <div id='page-controls'>
         <button id='change-url'>Change URL</button>
         <button id='reload'> Reload Page </button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button id='new-tab'> New Tab </button>
         <button id='close-tab'> Close Tab </button>
         <button id='change-tab'> Change Tab </button>
@@ -48,7 +55,9 @@
     <div id='other-controls'>
         <button id='back'> Back a Page </button>
         <button id='forward'> Forward a Page </button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button id='find'> Search the Page </button>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        <button id='zoom-in'> Zoom In </button>
         <button id='zoom-out'> Zoom Out </button>
     </div>

@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.body.appendChild(input);
         var submit = document.createElement('button');
         submit.type = 'submit';
-        submit.textContent = 'Search';
+        submit.textContent = 'Enter';
         document.body.appendChild(submit);
         
         $(input).focus();
