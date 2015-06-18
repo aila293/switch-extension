@@ -24,7 +24,11 @@ function injectKeyboard(){
     keyboard.style.cssText = style_txt;    
     document.documentElement.appendChild(keyboard); 
     
-    //$(text_selector).focus(openKeyboard);
+    chrome.storage.sync.get({keyboard: false}, function(items){
+        if (items.keyboard){
+            $(text_selector).focus(openKeyboard);
+        }
+    });
 }
 
 var txt_field; //jQuery object, keep for backup in case the active class is lost?
@@ -139,7 +143,19 @@ function injectPanel(){
     for (var i=0;i<style.length;i++){
         style_txt += style[i];
     }    
-    panel.style.cssText = style_txt;    
+    panel.style.cssText = style_txt;  
+    
+//    $(document).click(function(){
+//        console.log("click");
+//        console.log($('iframe')[0]);
+//        $('iframe')[0].click();
+//    });
+//    
+    $('iframe').each(function(){
+       // console.log(this);
+      //  var document = this.contentDocument;
+//        console.log($(document).find('a')[0]);
+    });
 }
 
 function injectMyStyles(){
@@ -218,27 +234,35 @@ function isVisible(element){ //DOM element
 }
 
 //return DOM of closest 'submit' button to txt_field by midpoint
-function findSubmit(){
-    var txt_rect = txt_field.get(0).getBoundingClientRect();
+function findSubmit(){    
     var submits = $(':submit');
     
-    var submit_rect = submits[0].getBoundingClientRect();
-    var min_dist = getDistanceRects(txt_rect, submit_rect);
+    var min_dist = getDistanceBetweenEls(txt_field[0], submits[0]);
     var closest_submit = submits[0];
     
-    for (var i=1; i<submits.length; i++){
-        submit_rect = submits[i].getBoundingClientRect();
-        var dist = getDistanceRects(txt_rect, submit_rect);
+    submits.each(function(){
+        var dist = getDistanceBetweenEls(txt_field[0], this);
         if (dist < min_dist) {
             min_dist = dist;
-            closest_submit = submits[i];
+            closest_submit = this;
         }
-    }
+    });
+//    for (var i=1; i<submits.length; i++){
+//        submit_rect = submits[i].getBoundingClientRect();
+//        var dist = getDistanceRects(txt_rect, submit_rect);
+//        if (dist < min_dist) {
+//            min_dist = dist;
+//            closest_submit = submits[i];
+//        }
+//    }
     //if none found, try last child of <form>?, id with 'submit' in it
     return closest_submit;
 }
 
-function getDistanceRects(rect1, rect2){
+function getDistanceBetweenEls(el1, el2){
+    var rect1 = el1.getBoundingClientRect();
+    var rect2 = el2.getBoundingClientRect();
+    
     var rect1_mid = [(rect1.left+rect1.right)/2, 
                 (rect1.top+rect1.bottom)/2];
     var rect2_mid = [(rect2.left+rect2.right)/2, 
@@ -276,8 +300,6 @@ function nextSection(){
         if (index == list.length){index=0;}
         $(list[index]).addClass('current-sub-section');
     }
-//        addStyle('body', '{opacity: .9;}');
-//        addStyle('.active-section *', '{opacity: 1;}');
     
     //scroll to place
     if ($('.current-sub-section').length>0 && !(isVisible($('.current-sub-section')[0]))){
@@ -290,23 +312,33 @@ function nextSection(){
 
 function selectSection(){
 
+    var current_sub_section = $('.current-sub-section'); 
+    
      //if going from a main section to sub-section
-    if ($('.current-sub-section').length == 0){
+    if (current_sub_section.length == 0){
          $(".active-section").find('.conceptual-sub-section').first().addClass('current-sub-section');
     }
 
-    //if the current section being selected is/has one link
-    else if ($('.current-sub-section').is('a')){
-                $('.current-sub-section')[0].click();
+    //if the current section being selected is/has one interactable
+    else if (current_sub_section.is(interaction_selectors)){
+        if (current_sub_section.is('link,button')){
+            current_sub_section[0].click();
+        } else if (current_sub_section.is(text_selector)){ 
+            current_sub_section.focus();
+        } else { //if non-text input
+            current_sub_section[0].click();
+        }
        // chrome.runtime.sendMessage("refocus");        
     }
 
     //if going from sub-section to a sub-sub-section
     else {
-        mapSection($('.current-sub-section'));
+        mapSection(current_sub_section);
+        //move "active section" to the currently section
         $('.active-section').removeClass('active-section');
-        $('.current-sub-section').removeClass('current-sub-section').addClass('active-section');
-        $('.active-section').find('.conceptual-sub-section').first().addClass('current-sub-section');
+        current_sub_section.removeClass('current-sub-section').addClass('active-section');
+        //set new "current sub-section"
+       current_sub_section.find('.conceptual-sub-section').first().addClass('current-sub-section');
     }               
                 
 }
@@ -316,6 +348,7 @@ function backSection(){
     if ($('.active-section').is('.conceptual-section')){
         unmapSection($('.current-sub-section'));
         $('.current-sub-section').removeClass('current-sub-section');
+        
     //if active-section is a sub-section
     }  else {
         unmapSection($('.active-section'));
@@ -332,21 +365,30 @@ function unmapSection(section){
 }
 
 function sectionOff(selector){
-    //include items whose ids or classes match the selector, not just the tagname
-    $(selector+', .'+selector+', #'+selector).has('a:visible').each(function(){
-        if ($(this).closest('.conceptual-section').length == 0){
-            $(this).addClass('conceptual-section');            
+    //includes items whose ids or classes match the tagname
+    $(selector+', .'+selector+', #'+selector).has(interaction_selectors).each(function(){
+        if ($(this).closest('.conceptual-section').length == 0 
+            && isSmallEnough($(this))
+           ){
+            $(this).addClass('conceptual-section');  
+            console.log(this);
         }
-    });        
+    });    
 }
 
-function isTooBig(element){
-//    console.log(element.width());
-//    console.log(element.width());
-//    console.log((window.innerWidth*.9));
-    return (element.width() > (window.innerWidth*.9) && element.height()>1000)
+function isSmallEnough(element){
+    var result = (element.width() > (window.innerWidth*.9) && element.height()>(window.innerWidth*.5))
     || element.is('body, html');
+    if (!(result)){
+        console.log(element[0]);
+        console.log(element.width() > (window.innerWidth*.9));
+        console.log(element.height()>(window.innerWidth*.5));
+    }
+    return !(result);
 }
+
+var interaction_selectors = "a:visible, input:visible, button:visible";
+var first_interaction_selectors = "a:first-of-type:visible, input:first-of-type:visible, button:first-of-type:visible";
 
 function mapDOM(){
     sectionOff('header');
@@ -357,50 +399,43 @@ function mapDOM(){
     sectionOff('ol, ul');
     sectionOff('table');
     sectionOff('article');
-    //sectionOff('main'); //sometimes takes up whole page
+    sectionOff('main'); //sometimes takes up whole page
     sectionOff('p');
     
     //catch all the rest of the links
-    $( "a:first-of-type:visible" ).each(function(){
+    $(first_interaction_selectors).each(function(){
         if ($(this).closest('.conceptual-section').length == 0){
-            if (isTooBig($(this).parent())){
-                $(this).addClass('conceptual-section'); 
-            } else {
+            if (isSmallEnough($(this).parent())){
                 $(this).parent().addClass('conceptual-section'); 
+            } else {
+                $(this).addClass('conceptual-section'); 
             }
         }
     });
     
-    //remove any overlaps created by previous step
+    //remove any nested sections created by previous step
     $( ".conceptual-section" ).each(function(){
         if ($(this).parents('.conceptual-section').length != 0){
             $(this).removeClass('conceptual-section');
         }
     });
     
-    
     //group 1-link sections that are siblings with other sections
      $( ".conceptual-section" ).each(function(){
-        if ($(this).find('a:visible').length == 1){             
+        if ($(this).find(interaction_selectors).length == 1){
             var parent = $(this).parent(); 
             if (parent.children('.conceptual-section').length > 1){
-                if (!(isTooBig(parent))){ 
-                    parent.addClass('conceptual-section');
-                    parent.find('.conceptual-section').removeClass('conceptual-section');   
-                }
+                tryCombineSections(parent);
             }
         }
     });  
     
-        //group single-link sections that are part of a nested pattern of links (e.g. 2 siblings of "div a")
+        //group 1-link sections that are part of a nested pattern of links (e.g. 2 siblings of "div a")
     $( ".conceptual-section" ).each(function(){
             var parent = $(this).parent(); 
             var type = this.tagName;
             if (parent.children(type+'.conceptual-section').length > 1){
-                if (!(isTooBig(parent))){ 
-                    parent.addClass('conceptual-section');
-                    parent.find('.conceptual-section').removeClass('conceptual-section');   
-                }
+                tryCombineSections(parent);
             }
     });  
     
@@ -410,40 +445,59 @@ function mapDOM(){
             var grandparent = parent.parent(); 
             var parent_type = parent[0].tagName.toLowerCase();
             if (grandparent.children(parent_type).children('.conceptual-section').length > 1){
-                if (!(isTooBig(grandparent))){ 
-                    grandparent.addClass('conceptual-section');
-                    grandparent.find('.conceptual-section').removeClass('conceptual-section');   
-                }
+                tryCombineSections(grandparent);
             }
     });    
     
-    //combine two adjacent sections with few links? or just in sub-sections
+    //group 1-link sections that are near other 1-link sections
+    var single_sections = $(".conceptual-section").filter(function(){
+        return $(this).find(interaction_selectors).length == 1;
+    });
+    for (var i=0;i<single_sections.length-1;i++){
+        if (getDistanceBetweenEls(single_sections[i], single_sections[i+1]) < 400){
+            var parent = $(single_sections[i]).parent();
+            while (parent.find(single_sections[i+1]).length == 0){
+                parent = parent.parent();
+            }
+            tryCombineSections(parent); //closest ancestor of both elements
+        }
+    }
+        
+    //group sections by location if $(".conceptual-section).length is too high
+    
     
     //$('.conceptual-section').each(function(){   mapSections($(this));   });
 }
 
+function tryCombineSections(new_section){
+     if (isSmallEnough(new_section)){ 
+        new_section.addClass('conceptual-section');
+        new_section.find('.conceptual-section').removeClass('conceptual-section');   
+     }
+}
+
 function tabLinks(section){ //makes each link in the jquery object a sub-section
-    section.find('a').addClass('conceptual-sub-section');
+    section.find(interaction_selectors).addClass('conceptual-sub-section');
 }
 
 var main_section_index;
 var sub_section_index;
 function mapSection(section){  //takes 1 jquery object, can be section || subsection
-    var links = section.find('a');
-    var sub_sections = section.children().has('a'); //set of children with links
+    var interactables = section.find(interaction_selectors);
+    var sub_sections = section.children().has(interaction_selectors); //set of children with links
 
-    if (links.length < 6){ //or whatever number
+    if (interactables.length < 6){ //or whatever number
         tabLinks(section);
     } else {
 
-        while (sub_sections.length < links.length){ 
+        while (sub_sections.length < interactables.length){ 
             if (sub_sections.length == 1){  //only one child: try next level
-                sub_sections = sub_sections.children().has('a');
+                sub_sections = sub_sections.children().has(interaction_selectors);
             } else {
                 sub_sections.addClass('conceptual-sub-section');
                 
                 //add links that are outside sub-sections
-                section.find('a').each(function(){
+                section.find(interaction_selectors).each(function(){
                     if ($(this).closest('.conceptual-sub-section').length == 0
                        || $(this).closest('.conceptual-sub-section')[0] == section[0]) //for when 'section' argument is a sub-section 
                     {
@@ -456,16 +510,16 @@ function mapSection(section){  //takes 1 jquery object, can be section || subsec
         }
 
         //if  # of sub_sections == # of links, there are no natural DOM divisions. 
-        if (sub_sections.length == links.length){
+        if (sub_sections.length == interactables.length){
             tabLinks(section);
         }
     }
     
     //reduce single-link sections into just that link
     sub_sections.each(function(){
-        if ($(this).find('a').length == 1){
+        if ($(this).find(interaction_selectors).length == 1){
             $(this).removeClass('conceptual-sub-section');
-            $(this).find('a').addClass('conceptual-sub-section');
+            $(this).find(interaction_selectors).addClass('conceptual-sub-section');
         }
     });
     //artificially break long (many links) sections (e.g. W3schools)
@@ -495,6 +549,11 @@ window.addEventListener("message", function(event){
             case 'select-section': selectSection(); break;
             case 'back-section': backSection(); break;
             case 'open': openKeyboard();    break;
+            case 'lost focus':
+                if (!($(':focus').is(text_selector))){
+                    chrome.runtime.sendMessage("refocus"); 
+                }
+                break;
                 
             case 'back': window.history.back(); break; //allow larger view of history
             case 'forward': window.history.forward(); break;
@@ -517,35 +576,33 @@ window.addEventListener("message", function(event){
 }, false);
 
 
-/*  Questions 
+/*  
+
+Questions 
     -can I get to the omnibox / address bar?
     -is there a better way to detect if a page is https or http
-    -how will it interact with the user's preexisting keyboard
+    -how will it interact with the user's own virtual keyboard
 
-
-*/
-
-//active-section: element you're moving around in, pink
-//current-sub-section: thing you're about to select
-
-/*
-
-To do now:
-    -include links + inputs in sections
-    -custom scroll amount 
-    -create settings page: 
+To do:
+    -fix terrible sectioning
+    -settings: 
         -implement auto-scan w/ variable speed
-                
-To do hopefully:
-    -better styling (sections, focus border, layout, etc.)
-    -deal with inner page reloads/new content
-        -put focus back in ctrl panel (blur handler?)
-        -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+        -implement variable key codes in keyboard.js and popup.js
+    -clearer styling of sections
+        -remove differences btwn main sections and sub-sections
+    -access links/inputs in iframes?
+        -can't access the iframes in the New Tab page because protocol is "chrome-search"
+    -querying the active tab only works if one window open
         
 To do later:
-    -all other browser/window controls
+    -add bookmarking functions
+    -custom scroll amount, zoom amount
+    -other browser/window controls (larger history, window resizing/snapping/manipulation)
     -connect the "search" function with link selection
-    
+    -allow user to create page-specific buttons for common actions
+    -store keyboards as json objects and allow different layouts
+    -clean/refactor code
+
 Ongoing issues:
 -email sites don't work
 -docking overlaps on some sites (KhanAcademy / Youtube)
@@ -553,14 +610,11 @@ Ongoing issues:
 -more possible selectors for submit buttons
 -links/inputs not visible and don't know why (Kongregate, email)
 
-Eventually:
-- make keyboard as json object, use different keyboard layouts
-- allow user to create page-specific buttons for common actions
-- refactor/clean code
-
 https://github.com/jjallen37/ChromeFormSwitch
 https://object.io/site/2011/enter-git-flow/
 mousetrap (create keyboard shortcuts) 
+-https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+
 
 Fix scroll issue:
     -wrap body in own div, shorten, append iframe

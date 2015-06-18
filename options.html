@@ -6,9 +6,6 @@
         :focus {
             border: solid red 3px !important;
         }
-        img {
-            width: 25px;
-        }
         body{
             font-size: 18px;
             line-height: 40px;
@@ -22,49 +19,52 @@
 <body>
 <form>
     
-  <section>
-    Auto - Scan: 
-    <input type="radio" name="auto-scan" value="on"> On
-    <input type="radio" name="auto-scan" value="off" checked> Off 
-      </section>
-   
-    <br>
-    
-    <!-- if auto-scan on -->
-    <section id='scanrate'>Scan rate:
-    <input type="number" name="scan-rate" min="1" max="5">
-        <br><br>
+    <section>
+        Auto - Scan: 
+        <input type="radio" name="auto-scan" value="on"> On
+        <input type="radio" name="auto-scan" value="off" checked> Off 
     </section>
     
-
-    <section>
-    Key inputs: <br>
-    
-    <!-- if auto-scan off -->
-    <div class='scan'>Scan key: <span class='scan'></span><button class='scan'>Set </button></div> 
-    
-    <div> Select key: <span class='select'></span> <button class= 'select'> Set</button> </div>
+    <section id='scanrate'>Scan rate:
+        <input type="number" name="scan-rate" min="0" >
     </section> <br>
     
-<!-- Scroll Amount: <br>
-    <input type="number" name="quantity" min="1" max="5"> -->
-    
+    <section>
+        Key inputs: <br>
+        <div class='scan'> 
+            Scan key: 
+            <span class='scan'></span>
+            <button class='scan set'> Set </button>
+        </div> 
+        <div> 
+            Select key: 
+            <span class='select'></span> 
+            <button class= 'select set'> Set </button> 
+        </div>
+    </section> <br>
     
     <section>
-    Choose what page to open new tabs on: <br>
-     <input type="radio" name="newtab-page" value="google.com"> Google.com
-    <br>
-    <input type="radio" name="newtab-page" value="chrome"> Chrome's default "New Tab" page 
-    <br>
-    <input type="radio" name="newtab-page" value="custom"> Custom URL: <span id='custom-url'></span>
+        Built-in Keyboard: 
+        <input type="radio" name="keyboard" value="on"> On
+        <input type="radio" name="keyboard" value="off" checked> Off 
     </section> <br>
-    <br>
+    
+    <section>
+        Choose what page to open new tabs on: <br>
+         <input type="radio" name="newtab-page" value="https://www.google.com"> Google.com <br>
+        <input type="radio" name="newtab-page" value="chrome://newtab"> Chrome's default "New Tab" page <br>
+        <input type="radio" name="newtab-page" value="other"> Custom URL: <input name='custom-url'>  
+<!-- appear if this option is checked-->
+    </section> <br>
         
     <section>
-    <input type="submit" name="save" id='save'>
-        </section>
-
-    <div id='status'> </div>
+        <input type="submit" name="save" id='save'>
+        <span id='status'></span>
+    </section> <br>
+    
+    <section>
+        <button id='return'>Close this page</button>
+    </section>
 
 </form>
 </body>

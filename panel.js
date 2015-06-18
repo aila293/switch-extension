@@ -1,42 +1,44 @@
 function setTabIndex(){
     var i =1;
-    $('button,div').each(function(index){
+    $('button,section').each(function(index){
        this.tabIndex = i++; 
     });
 }
 
-function setFirstSectionFocus(){$('div').first().focus();}
-function setNextSectionFocus(div){$(div).next().focus();};
+function setFirstSectionFocus(){$('section').first().focus();}
+function setNextSectionFocus(section){$(section).next().focus();};
 function setParentFocus(button){$(button).parent().focus();}
-function setChildFocus(div){$(div).children().first().focus();}
+function setChildFocus(section){$(section).children().first().focus();}
 function setFirstSiblingFocus(button){$(button).parent().children().first().focus();}
  
+function setUpNavigation(){
+    chrome.storage.sync.get({
+        scan_code: 9, 
+        select_code: 13
+    }, function(items){
 
-document.addEventListener('DOMContentLoaded', function() {
-//window.addEventListener('load', function() {
-
-    setTabIndex();
-    
     $('button').keydown(function(e){
         e.stopPropagation();
-        if (e.which===13){  //enter
+        if (e.which == items.select_code){
             window.parent.postMessage(this.id, "*")
             setFirstSiblingFocus(this);
-        } else if (e.which === 9){  //tab   
-            if ($(this).next().length == 0){ //if last button in section
-                e.preventDefault();
+        } else if (e.which == items.scan_code){
+            e.preventDefault();
+            if ($(this).next().length == 0){
                 setParentFocus(this);
+            } else {
+                $(this).next().focus();
             }
         }
     });
     
-    $('div').keydown(function(e){
+    $('section').keydown(function(e){
         e.stopPropagation();
         e.preventDefault();
         
-        if (e.which===13){ //enter
+        if (e.which == items.select_code){
             setChildFocus(this);
-        } else if (e.which === 9){ //tab
+        } else if (e.which == items.scan_code){
             if ($(this).next().length == 0){
                 setFirstSectionFocus();
             } else {
@@ -44,13 +46,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }            
         }
     });
+        
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+//window.addEventListener('load', function() {
+
+    setTabIndex();
+    
+    setUpNavigation();
     
     setFirstSectionFocus();
     
+    $('*').blur(function(){
+        window.setTimeout(function(){
+            if ($(':focus').length == 0){
+                window.parent.postMessage("lost focus", "*");
+                //routes to content script for page access, 
+                //then to background to respond to this frame
+            }
+        }, 300); //wait for the new element to get the focus
+    });
+    
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-//         console.log(message);
         if (message === 'refocus'){
-            resetFocus(); 
+                setFirstSectionFocus(); 
         }  
     });
 });

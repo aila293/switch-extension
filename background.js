@@ -44,17 +44,17 @@ function changeTab(){
     chrome.windows.getLastFocused({populate: true}, function(window){
         browser_tabs = window.tabs;
         var height = browser_tabs.length * 45 + 20;
-        chrome.windows.create({'url': 'popup.html', 'width': 400, 'height': height, 'type': 'popup'}, function(window) {}); 
+        chrome.windows.create({'url': 'popup.html?changetab', 'width': 400, 'height': height, 'type': 'popup'}, function(window) {}); 
     });    
 }
 
 var browser_tabs;
-chrome.runtime.onMessage.addListener( //button_ids from the content script (panel.js)
+chrome.runtime.onMessage.addListener( //button_ids from the content script (from panel.js)
     function(message, sender, sendResponse) {
         switch(message){
             //relay to iframes
             case 'open':
-            case 'refocus': //I don't think this works?
+            case 'refocus':
                 chrome.tabs.query({active: true}, function(tabs){
                     chrome.tabs.sendMessage(tabs[0].id, message);
                 });
@@ -62,12 +62,18 @@ chrome.runtime.onMessage.addListener( //button_ids from the content script (pane
             
             //use chrome.tabs
             case 'reload': chrome.tabs.reload(); break;
-            case 'new-tab': chrome.tabs.create({url: "https://www.google.com"}); break;
+            case 'new-tab': 
+                chrome.storage.sync.get({ 
+                    newtab_url: "https://www.google.com", 
+                }, function(items) {
+                    chrome.tabs.create({url: items.newtab_url}); 
+                });
+                break;
             case 'copy-tab': getActiveTab(duplicate); break;
             case 'close-tab': getActiveTab(remove); break;
             case 'close-other-tabs': getAllTabs(closeOther); break;
             case 'change-url':
-                chrome.windows.create({'url': 'popup.html', 'width': 500, 'height': 110, 'type': 'popup'}, function(window) {}); 
+                chrome.windows.create({'url': 'popup.html?changeurl', 'width': 500, 'height': 110, 'type': 'popup'}, function(window) {}); 
                 break;
             case 'change-tab': changeTab(); break;
 //            case 'pin-tab': chrome.tabs.update({pinned: true}); break;
@@ -75,21 +81,18 @@ chrome.runtime.onMessage.addListener( //button_ids from the content script (pane
 //            case 'move-tab': chrome.tabs.move(); break;
             case 'zoom-in': case 'zoom-out': zoom(message); break;
             case 'find':
-                chrome.windows.create({'url': 'popup.html', 'width': 300, 'height': 110, 'type': 'popup'}, function(window) {}); 
+                chrome.windows.create({'url': 'popup.html?find', 'width': 300, 'height': 110, 'type': 'popup'}, function(window) {}); 
                 break;
             case 'settings':
                 var settings_url = "chrome-extension://"+ chrome.runtime.id + "/options.html";
-                chrome.tabs.query({active: true}, function(tabs){
-                 chrome.tabs.update(tabs[0].id, {url: settings_url}, function(tab){});
-                });
-                //chrome.runtime.openOptionsPage(); opens chrome://extensions, which isn't accessible
+                chrome.tabs.create({url: settings_url});
                 break;
       }
   });
 
 //information from the popup page, sent through controls.js
 window.addEventListener("message", function(event){
-    //tab_id for which tab to switch to
+    //purpose as event.data[0], information as event.data[1]
     switch(event.data[0]){
         case 'change-tab':
             var tabid = parseInt(event.data[1]);
@@ -111,8 +114,7 @@ window.addEventListener("message", function(event){
                         chrome.tabs.update(tabs[0].id, {url: new_url});
                     }
                 });
-
             });
-            break;
+            break;            
       }
 });

@@ -24,55 +24,87 @@ function closeWindow(){
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    //window width as proxy for purpose of the popup, refine later
-    if (window.innerWidth > 450){ //change-url
-        document.title = "Enter new URL";
-        var input = document.createElement('input');
-        input.value = "https://www.";
-        document.body.appendChild(input);
-        var submit = document.createElement('button');
-        submit.type = 'submit';
-        submit.textContent = 'Enter';
-        document.body.appendChild(submit);
-        
-        $(input).focus();
-        
-        $(submit).click(function(){
-            background.postMessage(["change-url", $('input').val()], "*");
-            closeWindow();
-        });
+    chrome.tabs.query({windowType: "popup"}, function(tabs){
+        var url = tabs[0].url;
+        var pos = url.indexOf("popup.html");
+        var purpose = url.substring(pos + 11); //this to end
+    
+    switch(purpose){
+        case 'changeurl':
+            document.title = "Enter new URL";
+            var input = document.createElement('input');
+            input.value = "https://www.";
+            document.body.appendChild(input);
+            var submit = document.createElement('button');
+            submit.type = 'submit';
+            submit.textContent = 'Enter';
+            document.body.appendChild(submit);
+
+            $(input).focus();
+
+            $(submit).click(function(){
+                background.postMessage(["change-url", $('input').val()], "*");
+                closeWindow();
+            });
+            break;
                 
-    } else if (window.innerWidth > 350){ // change-tab
-        document.title = "Select Tab";
-        populateTabs();
-        $('button').first().focus();
+        case 'changetab':
+            document.title = "Select Tab";
+            populateTabs();
+            $('button').first().focus();
 
-        $('button').click(function(){
-            background.postMessage(["change-tab", this.id], "*");
-            closeWindow();
-        });
+            $('button').click(function(){
+                background.postMessage(["change-tab", this.id], "*");
+                closeWindow();
+            });
+            break;
         
-    } else { //find
-        document.title = "Enter text";
-        var input = document.createElement('input');
-        document.body.appendChild(input);
-        var submit = document.createElement('button');
-        submit.type = 'submit';
-        submit.textContent = 'Search';
-        document.body.appendChild(submit);
-        var exit = document.createElement('button');
-        exit.textContent = 'Exit Search';
-        document.body.appendChild(exit);
+        case 'find':
+            document.title = "Enter text";
+            var input = document.createElement('input');
+            document.body.appendChild(input);
+            var submit = document.createElement('button');
+            submit.type = 'submit';
+            submit.textContent = 'Search';
+            document.body.appendChild(submit);
+            var exit = document.createElement('button');
+            exit.textContent = 'Exit Search';
+            document.body.appendChild(exit);
 
-        $('input').focus();
+            $('input').focus();
+
+            $(submit).click(function(){
+                background.postMessage(["find", $('input').val()], "*");
+            });
+
+            $(exit).click(closeWindow);
+            break;
         
-        $(submit).click(function(){
-            background.postMessage(["find", $('input').val()], "*");
-        });
-        
-        $(exit).click(closeWindow);
+        case 'scankey': case 'selectkey':
+            document.body.textContent = "Enter scan input now";
+            $(document).keydown(function(e){
+                var pages = chrome.extension.getViews({type: 'tab'});
+                
+                if (pages.length ==0){
+                    pages = chrome.extension.getViews({type: 'popup'});
+                }
+                var options_page = pages[0];
+        //doesn't work in the chrome options link
+      
+//                for (var i=0;i<pages.length;i++){
+//                    console.log(pages[i]);
+//                    if (pages[i] != background){ 
+//                        options_page = pages[i];
+//                        break;
+//                    }
+//                }
+                
+                console.log(options_page);
+                options_page.postMessage([purpose, e.which], "*");
+                //replace messaging with using chrome.storage and handling onChanged in options.js?
+                closeWindow();
+            });
     }
-    
-    
-
+        
+    });
 });
