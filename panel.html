@@ -13,6 +13,9 @@
         :focus {
             border: solid red 3px !important;
         }
+        #interaction-controls button:not(#map-sections){
+            display: none;
+        }
     </style>
     
     <script src="panel.js"></script>  
@@ -24,29 +27,27 @@
     <section id='scroll-controls'>
         <button id='down'>Scroll Down</button>
         <button id='up'>Scroll Up</button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button id='bottom'>Scroll to Bottom</button>
         <button id='top'>Scroll to Top</button>
-<!--        <button id='custom'> Custom Scroll </button>-->
     </section>
 
     <section id= 'interaction-controls'>
         <button id='next-section'> Next Section </button>
         <button id='select-section'> Select Section </button>
-        <button id='back-section'> Go Back a Section </button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <button id='prev-section'> Previous Section </button>
+        <button id='back-section'> Go Up a Level </button>
+        <button id='map-sections'> Section the Page </button>
+        <button id='unmap-sections'> Clear Sections </button>
+    </section>
+    
+    <section>
         <button id='open'>Open Keyboard</button>
         <button id='settings'> Extension Settings </button>
     </section>
     
-<!--    <br> --> 
-    <!--    messes up the "next" function for section tabbing --> 
-
-    
     <section id='page-controls'>
         <button id='change-url'>Change URL</button>
         <button id='reload'> Reload Page </button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button id='new-tab'> New Tab </button>
         <button id='close-tab'> Close Tab </button>
         <button id='change-tab'> Change Tab </button>
@@ -55,9 +56,7 @@
     <section id='other-controls'>
         <button id='back'> Back a Page </button>
         <button id='forward'> Forward a Page </button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button id='find'> Search the Page </button>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        <button id='zoom-in'> Zoom In </button>
         <button id='zoom-out'> Zoom Out </button>
     </section>
@@ -86,8 +85,6 @@
     
 <!--    <button id='print'> Print screen </button>
     //Can't support navigating the iframe pop-up atm-->
-    
-    
 </body>
 
 </html>

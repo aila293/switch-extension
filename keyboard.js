@@ -1,109 +1,121 @@
 var letters = ['e','t','a','o','i','n','s','h','r','d','l','u','c','m','f','w','y','p','v','b','g','k','j','q','x','z'];
 
-var others = [' ', 'backspace', '\n', 'clear', '.', '-', ',', '?', '+','='];
+var punctuation = ['space','backspace','new line',',','.',
+                   '\'','\"','-','?','!',
+                   '/','@','#','_',':',';'];
 
 var capitals = ['E','T','A','O','I','N','S','H','R','D','L','U','C','M','F','W','Y','P','V','B','G','K','J','Q','X','Z'];
 
-function loadKeys(){
-    for (var i=0;i<letters.length;i++){
-        $("#letters_sect").append("<span class='key letter' tabindex='"+(i+2)+"'>"+letters[i]+"</span>"); //tab starts at 2 (1 is the section)
+
+var symbols = ['1','2','3','4','5',
+               '6','7','8','9','0',
+               '$','&','*','(',')',
+               '%','^','+','=', '\\',
+               '[',']','{','}','|','~'];
+
+function loadKeys(arr, section, tab_offset){
+    var size = 5; //section size
+    for (var i=0;i<arr.length;i++){
+        if ((i>0 && arr.length-i>=size) && i%size==0){section = section.next();}
+        section.append("<span tabindex='"+(i+tab_offset)+"'>"+arr[i]+"</span>");
     }   
-    
-    $('#others_sect').attr('tabindex', [letters.length+2]);
-    for (var i=0;i<others.length;i++){
-        $("#others_sect").append("<span class='key other' tabindex='"+(i+letters.length+3)+"'>"+others[i]+"</span>");
-    }   
-    
-    labelKey(0, 'space');
-    labelKey(2, 'newline');
-    
-    $('.other')[1].id = "backspace"; //set id for styling (font)
-    $('.other')[3].id = "clear";
 }
 
-function labelKey(index, name){ //for 'other' keys that need different content/appearance. index = place in 'other' array
-    $('.other')[index].id = name;
-    var host = document.getElementById(name);
-    var root = host.createShadowRoot();
-    root.textContent = name;
-}
-
-function resetFocus(){
-    $('#letters_sect').focus();
-}
+function resetFocus(){ $('div').first().focus(); }
 
 function updateLetters(){
     var new_letters;
-    if (caps_on){
-        new_letters = capitals;
-    } else {
-        new_letters = letters;
-    }
-    for (var i=0;i<new_letters.length;i++){
-        ($('.letter')[i]).innerText = new_letters[i];
+    if (caps_on){new_letters = capitals;}
+    else { new_letters = letters; }
+    
+    $('#letters_div').find('span').each(function(index, el){
+        this.innerText = new_letters[index];
+    });
+}
+
+function processButton(id){
+    switch(id){
+        case 'caps':
+            caps_on = !(caps_on);
+            updateLetters(); 
+            $('#letters_div').focus();                  
+            break;
+        case 'symbols':
+            if ($('#symbols_div').is(':visible')){
+                $('#symbols_div').hide();
+                this.innerText = "Show Numbers/Symbols";
+            } else {
+                $('#symbols_div').show();
+                this.innerText = "Hide Numbers/Symbols";
+            }
+            $('#symbols_div').focus();
+            break;
+        default:
+            resetFocus();
+            window.parent.postMessage(id, "*");   
     }
 }
 
 var caps_on = false;
 
 document.addEventListener('DOMContentLoaded', function() {
-    loadKeys(); 
+    loadKeys(letters, $('#letters1'), 2);
+    loadKeys(punctuation, $('#punctuation1'), $('#punctuation1')[0].tabIndex + 1);
+    loadKeys(symbols, $('#symbols1'), $('#symbols1')[0].tabIndex + 1)
+    $('#punctuation1').children()[1].id = "backspace"; //id for font-setting
     
-    $('button').keydown(function(e){
+    chrome.storage.sync.get({
+        scan_code: 9, 
+        select_code: 13
+    }, function(items){
+       
+    $('div,section,button,span').keydown(function(e){
         e.stopPropagation();
-        if (e.which===13){ //enter
-            var button_id = $(this).attr('id');
-            if (button_id==='caps'){
-                caps_on = true;
-                updateLetters(); 
-                $('.letter').first().focus(); //assume you want a letter after selecting 'caps'
-            } else {
-                resetFocus();
-                window.parent.postMessage(button_id, "*")
-                // id = 'close' keyboard, 'submit' text, "next-input"
-            }
-        }
-    });
-    
-    $('.section').keydown(function(e){
-        var focus = $(':focus');
-        if (e.which===9){ //tab
-            e.preventDefault();
-            var next_section = focus.next();
-            if (next_section.length === 0){
-                resetFocus();
-            } else {
-                next_section.focus();
-            }
-        } else if (e.which===13){ //enter
-            focus.children(':first').focus();
-        }
-    });
-    
-    $('.key').keydown(function(e){
-        e.stopPropagation();
-        if (e.which===13){ //enter
-            window.parent.postMessage($(':focus').text(), "*");  //to controls.js
-            //type into own textbox
-            var txt_field = $('#text');
-            var val = txt_field.val(); 
-            if ($(':focus').text()==='backspace'){
-                val = val.substring(0,val.length-1);
-            } else {
-                val += $(':focus').text(); 
-            }
-            txt_field.val(val);
-            
-            resetFocus(); 
-            if (caps_on){
-                caps_on=false;
-                updateLetters();
-            }      
-        }
-    });
+        e.preventDefault();
+       
+        if (e.which == items.scan_code){
+            var next = $(this).next();
 
+            if (!(next.is(':visible'))){next = next.next();}
+
+            if (next.length==0){
+                if ($(this).is('div')){
+                    next = $('div').first();
+                } else {
+                    next = $(this).parent();
+                }
+            }
+            
+            next.focus();
+        
+        } else if (e.which == items.select_code){
+
+            switch(this.tagName){
+                case 'DIV': case 'SECTION':
+                    $(this).children()[0].focus();
+                    break;
+                case 'BUTTON': processButton(this.id); break;
+                case 'SPAN':   
+                    window.parent.postMessage(this.innerText, "*");  
+                    
+                    if ($(this).closest('div')[0].id=='letters_div'){
+                        $('#letters_div').children()[0].focus();
+                    } else {
+                        resetFocus(); 
+                    }
+                    
+                    if (caps_on){
+                        caps_on=false;
+                        updateLetters();
+                    } 
+                    break;
+            }
+        }
+    });
+        
+    });
     
- chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 //     console.log(message);
         if (message === 'open'){
             resetFocus(); 

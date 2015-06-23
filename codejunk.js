@@ -1,3 +1,59 @@
+
+
+function labelKey(index, name){ //for keys that need different content/appearance. index = place in 'other' array
+    $('#punctuation1').children()[index].id = name;
+    var host = document.getElementById(name);
+    var root = host.createShadowRoot();
+    root.textContent = name;
+}
+
+
+//docking stuff
+   
+    //docking setup
+    var html =  document.documentElement;
+    html.style.overflow = 'auto';
+    document.body.style.maxHeight = '100%';
+
+    document.body.style.overflow = ''; //undocks this space
+    
+var hidden_height = 210;
+function dockKeyboard(){
+    document.body.style.overflow = 'inherit';
+    
+    window.onresize = function (){
+        document.body.style.height = 
+            (window.innerHeight - hidden_height) + 'px';
+        
+     //attempts to fix docking/sidebar irregularities 
+//        var pos = $('#keyboard-frame').offset();
+//
+//        //works on Youtube, picks a part of the nav bar in KA
+//        var cover = document.elementFromPoint(pos.left+10, pos.top+10);
+////        cover.style.height = (window.innerHeight -210)+'px';
+////        cover.style.overflowY = 'auto';
+//        console.log(cover);
+//        
+//        var all = $('div');
+//       // console.log(window.innerHeight-210);
+//        for (var i=0;i<all.length;i++){
+//            if ($(all[i]).height() + 210 > window.innerHeight
+//            
+//               && (all[i].className.indexOf("nav") > -1 
+//                   || all[i].className.indexOf("menu") > -1 )
+//               ){
+//            console.log(all[i]);
+//                all[i].style.height = (window.innerHeight - 210)+'px';
+//                all[i].style.overflowY = 'auto';
+//                break;
+//            }
+//        }
+    };
+    window.onresize(); 
+}
+
+
+
 //code for obsolete next-link / select-link buttons
             // for the event listener switch
             case 'next-link': nextLink();
@@ -53,6 +109,15 @@ function dockKeyboard(){
 
 
 /*              Debugging snippets          */
+
+
+//log first  iframe 
+    $(document).click(function(){
+        console.log("click");
+        console.log($('iframe')[0]);
+        $('iframe')[0].click();
+    });
+    
 
 // log scrollTop of all elements
     $(document).click(function(){

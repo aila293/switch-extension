@@ -37,7 +37,12 @@ function setUpNavigation(){
         e.preventDefault();
         
         if (e.which == items.select_code){
-            setChildFocus(this);
+            if (this.id=='interaction-controls'
+               && !($('#next-section').is(':visible'))){
+                window.parent.postMessage("map-sections", "*")
+            } else {
+                setChildFocus(this);    
+            }
         } else if (e.which == items.scan_code){
             if ($(this).next().length == 0){
                 setFirstSectionFocus();
@@ -59,6 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     setFirstSectionFocus();
     
+    $('#interaction-controls').children().first().hide();
+    
     $('*').blur(function(){
         window.setTimeout(function(){
             if ($(':focus').length == 0){
@@ -69,9 +76,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300); //wait for the new element to get the focus
     });
     
-    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-        if (message === 'refocus'){
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
+        switch(message){
+            case "refocus":
                 setFirstSectionFocus(); 
-        }  
+                break;
+            case "sectioning-on":
+                $('#interaction-controls button').show();
+                $('#map-sections').text("Re-section the page");
+                $('#next-section').focus();
+                break;
+            case "sectioning-off":
+                $('#interaction-controls button').hide();
+                $('#map-sections').show();
+                $('#map-sections').text("Section the page");
+                $('#map-sections').focus();
+                break;              
+        }
+       
     });
 });

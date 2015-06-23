@@ -42,6 +42,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
             $(input).focus();
 
+            //submits if either key is hit. 
+//            $(document).keydown(function(e){
+//                chrome.storage.sync.get({
+//                    scan_code: 9,
+//                    select_code: 13
+//                }, function(items){
+//                    if (e.which == items.scan_code 
+//                       || e.which == items.select_code){
+//                        background.postMessage(["change-url", $('input').val()], "*");
+//                        closeWindow(); 
+//                    }
+//                });
+//            });
+            
             $(submit).click(function(){
                 background.postMessage(["change-url", $('input').val()], "*");
                 closeWindow();
@@ -52,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.title = "Select Tab";
             populateTabs();
             $('button').first().focus();
-
+    
             $('button').click(function(){
                 background.postMessage(["change-tab", this.id], "*");
                 closeWindow();
@@ -81,15 +95,15 @@ document.addEventListener('DOMContentLoaded', function() {
             break;
         
         case 'scankey': case 'selectkey':
-            document.body.textContent = "Enter scan input now";
+            document.body.textContent = "Enter switch input now";
             $(document).keydown(function(e){
                 var pages = chrome.extension.getViews({type: 'tab'});
                 
+                //doesn't work from the chrome/extensions 'Options' link
                 if (pages.length ==0){
                     pages = chrome.extension.getViews({type: 'popup'});
                 }
-                var options_page = pages[0];
-        //doesn't work in the chrome options link
+                var options_page = pages[0]; 
       
 //                for (var i=0;i<pages.length;i++){
 //                    console.log(pages[i]);

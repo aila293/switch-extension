@@ -49,12 +49,15 @@ function changeTab(){
 }
 
 var browser_tabs;
-chrome.runtime.onMessage.addListener( //button_ids from the content script (from panel.js)
+chrome.runtime.onMessage.addListener( //from the content script 
     function(message, sender, sendResponse) {
         switch(message){
+                
             //relay to iframes
-            case 'open':
-            case 'refocus':
+            case "open":
+            case "refocus":
+            case "sectioning-on":
+            case "sectioning-off":
                 chrome.tabs.query({active: true}, function(tabs){
                     chrome.tabs.sendMessage(tabs[0].id, message);
                 });
