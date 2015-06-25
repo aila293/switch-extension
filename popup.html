@@ -3,7 +3,37 @@
 <head>
     <title> </title>
     <style>
-
+        body {
+            word-wrap: break-word;
+            font-size: 18px;
+        }
+        
+        #keyboard{
+            margin-top: 30px;
+        }
+        section span {
+            font-size: 22px;
+            display: inline-block;
+            height: 30px;
+            min-width: 30px;
+            width: auto;
+            border: solid black;
+            text-align: center;
+            margin: 1px;
+        }
+        span:focus {
+            color: red;
+            border: none !important;
+        }
+        section{
+            display: inline-block;
+            padding-right: 15px;
+        }
+        #symbols_div{
+            display: none;
+        }
+        
+        
         :focus {
             border: solid red 3px !important;
         }
@@ -18,16 +48,44 @@
         .active {
             border: solid blue 3px;
         }
-        body {
-            font-size: 18px;
-        }
     </style>
     
     <script src="popup.js"></script>  
+    <script src="keyboard.js"></script>  
     <script src="jquery-1.11.3.min.js"></script>
 </head>
   
 <body>
+
+    <main id='keyboard'>
+        <div tabindex='0' id='letters_div'>
+            <section id="letters1" tabindex='1'></section>
+            <section id="letters2" tabindex='10'></section>
+            <section id="letters3" tabindex='20'></section>
+            <section id="letters4" tabindex='30'></section>
+            <section id="letters5" tabindex='40'></section>
+        </div>
+
+        <div tabindex='49'>
+            <section id="punctuation1" tabindex='50'> </section> 
+            <section id="punctuation2" tabindex='60'> </section> 
+            <section id="punctuation3" tabindex='70'> </section> 
+        </div>
+
+        <div tabindex='100' id='symbols_div'>
+            <section id="symbols1" tabindex='101'></section>
+            <section id="symbols2" tabindex='110'></section>
+            <section id="symbols3" tabindex='120'></section>
+            <section id="symbols4" tabindex='130'></section>
+            <section id="symbols5" tabindex='140'></section>
+        </div>
+
+        <div tabindex='150'>
+            <button id='submit' tabindex='151'>Submit</button>
+            <button id='caps' tabindex='154'>Capital Letters</button>
+            <button id='symbols' tabindex='155'>Show Numbers/Symbols</button>
+        </div>
+    </main>
 
 </body>
 

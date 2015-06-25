@@ -22,6 +22,27 @@ function closeWindow(){
    }); 
 }
 
+function typeToInput(key){
+    var val = $('input').val();
+    switch(key){
+        case 'backspace':
+            val = val.substring(0,val.length-1);
+            break;
+        case 'clear':
+            val = '';
+            break;
+        case 'space':
+            val += " ";
+            break;
+        case 'new line':
+            val += "\n";
+            break;
+        default:
+            val += key;
+    }
+    $('input').val(val);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     
     chrome.tabs.query({windowType: "popup"}, function(tabs){
@@ -32,70 +53,84 @@ document.addEventListener('DOMContentLoaded', function() {
     switch(purpose){
         case 'changeurl':
             document.title = "Enter new URL";
-            var input = document.createElement('input');
-            input.value = "https://www.";
-            document.body.appendChild(input);
-            var submit = document.createElement('button');
-            submit.type = 'submit';
-            submit.textContent = 'Enter';
-            document.body.appendChild(submit);
-
-            $(input).focus();
-
-            //submits if either key is hit. 
-//            $(document).keydown(function(e){
-//                chrome.storage.sync.get({
-//                    scan_code: 9,
-//                    select_code: 13
-//                }, function(items){
-//                    if (e.which == items.scan_code 
-//                       || e.which == items.select_code){
-//                        background.postMessage(["change-url", $('input').val()], "*");
-//                        closeWindow(); 
-//                    }
-//                });
-//            });
             
-            $(submit).click(function(){
-                background.postMessage(["change-url", $('input').val()], "*");
-                closeWindow();
+            var input = document.createElement('input');
+            input.value = "https://www."; 
+            input.size="50";
+            $(input).insertBefore('#keyboard');            
+            $('#punctuation3').insertBefore($("#punctuation2"));
+            $('section').first().focus();
+            $('#punctuation1').children()[2].innerText = '.com'; //change 'newline' key to '.com' key for urls
+            
+            window.addEventListener("message", function(event){
+                if (event.data == 'submit'){
+                    background.postMessage(["change-url", $('input').val()], "*");
+                    closeWindow();                   
+                } else {
+                    typeToInput(event.data);
+                }
             });
+            
             break;
                 
         case 'changetab':
             document.title = "Select Tab";
             populateTabs();
+            $('#keyboard').remove();
+            
             $('button').first().focus();
-    
-            $('button').click(function(){
-                background.postMessage(["change-tab", this.id], "*");
-                closeWindow();
+            
+            chrome.storage.sync.get({
+                scan_code: 9,
+                select_code: 13
+            }, function(items){
+                $('button').keydown(function(e){
+                    e.preventDefault();
+                    if (e.which == items.scan_code){
+                        var next = $(this).next();
+                        if (next.length==0){
+                            next = $('button').first();
+                        }
+                        next.focus();
+                    } else if (e.which == items.select_code){
+                        background.postMessage(["change-tab", this.id], "*");
+                        closeWindow();                     
+                    }
+                });
             });
+            
             break;
         
         case 'find':
             document.title = "Enter text";
+            
             var input = document.createElement('input');
-            document.body.appendChild(input);
-            var submit = document.createElement('button');
-            submit.type = 'submit';
-            submit.textContent = 'Search';
-            document.body.appendChild(submit);
+            $(input).insertBefore('#keyboard');
+              
+            //replace 'capitals' with exit button
+            $('#caps').remove();
             var exit = document.createElement('button');
-            exit.textContent = 'Exit Search';
-            document.body.appendChild(exit);
+            exit.textContent='Exit Search';
+            exit.id = 'exit';
+            $(exit).insertBefore('#symbols');
 
-            $('input').focus();
+            $('section').first().focus();
 
-            $(submit).click(function(){
-                background.postMessage(["find", $('input').val()], "*");
+            window.addEventListener("message", function(event){
+                if (event.data == "submit"){
+                    background.postMessage(["find", $('input').val()], "*");
+                } else if (event.data == 'exit'){
+                    closeWindow();
+                } else {
+                    typeToInput(event.data);
+                }
             });
-
-            $(exit).click(closeWindow);
             break;
         
         case 'scankey': case 'selectkey':
             document.body.textContent = "Enter switch input now";
+            $('#keyboard').remove();
+            
             $(document).keydown(function(e){
                 var pages = chrome.extension.getViews({type: 'tab'});
                 

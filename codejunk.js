@@ -1,4 +1,18 @@
 
+//in popup, submits if either key is hit. 
+    $(document).keydown(function(e){
+        chrome.storage.sync.get({
+            scan_code: 9,
+            select_code: 13
+        }, function(items){
+            if (e.which == items.scan_code 
+               || e.which == items.select_code){
+                background.postMessage(["change-url", $('input').val()], "*");
+                closeWindow(); 
+            }
+        });
+    });
+
 
 function labelKey(index, name){ //for keys that need different content/appearance. index = place in 'other' array
     $('#punctuation1').children()[index].id = name;

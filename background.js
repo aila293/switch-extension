@@ -55,7 +55,7 @@ chrome.runtime.onMessage.addListener( //from the content script
                 
             //relay to iframes
             case "open":
-            case "refocus":
+            case "panel focus":
             case "sectioning-on":
             case "sectioning-off":
                 chrome.tabs.query({active: true}, function(tabs){
@@ -76,15 +76,16 @@ chrome.runtime.onMessage.addListener( //from the content script
             case 'close-tab': getActiveTab(remove); break;
             case 'close-other-tabs': getAllTabs(closeOther); break;
             case 'change-url':
-                chrome.windows.create({'url': 'popup.html?changeurl', 'width': 500, 'height': 110, 'type': 'popup'}, function(window) {}); 
+                chrome.windows.create({'url': 'popup.html?changeurl', 
+                                       'width': 600, 'height': 400, 
+                                       'type': 'popup'}, function(window) {}); 
                 break;
             case 'change-tab': changeTab(); break;
 //            case 'pin-tab': chrome.tabs.update({pinned: true}); break;
 //            case 'unpin-tab': chrome.tabs.update(tabid, {pinned: false}); break;
-//            case 'move-tab': chrome.tabs.move(); break;
             case 'zoom-in': case 'zoom-out': zoom(message); break;
             case 'find':
-                chrome.windows.create({'url': 'popup.html?find', 'width': 300, 'height': 110, 'type': 'popup'}, function(window) {}); 
+                chrome.windows.create({'url': 'popup.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
                 break;
             case 'settings':
                 var settings_url = "chrome-extension://"+ chrome.runtime.id + "/options.html";
@@ -110,13 +111,18 @@ window.addEventListener("message", function(event){
             });
             break;
         case 'change-url':
+            var intended_url;
             chrome.tabs.query({active: true}, function(tabs){
-                chrome.tabs.update(tabs[0].id, {url: event.data[1]}, function(tab){
-                    if (tab.url != (event.data[1]+"/")){ //detect if https didn't work
-                        var new_url = event.data[1].replace("https://www.", "http://www.");
-                        chrome.tabs.update(tabs[0].id, {url: new_url});
-                    }
+                intended_url = event.data[1];
+                chrome.tabs.update(tabs[0].id, {url: intended_url}, function(tab){
                 });
+            });
+            chrome.webNavigation.onErrorOccurred.addListener(function(details){
+                var url = details.url;
+                if (url == intended_url){
+                    url = url.replace("https://", "http://");
+                    chrome.tabs.update(details.tabId, {url: url}, function(tab){});
+                }
             });
             break;            
       }

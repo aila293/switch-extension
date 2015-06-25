@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
     loadKeys(letters, $('#letters1'), 2);
     loadKeys(punctuation, $('#punctuation1'), $('#punctuation1')[0].tabIndex + 1);
     loadKeys(symbols, $('#symbols1'), $('#symbols1')[0].tabIndex + 1)
-    $('#punctuation1').children()[1].id = "backspace"; //id for font-setting
     
     chrome.storage.sync.get({
         scan_code: 9, 

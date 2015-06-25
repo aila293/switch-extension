@@ -1,9 +1,37 @@
-//TYPING-RELATED
+/* INJECTING IFRAMES AND STYLES */
 
-var text_selector = ":text, textarea, input[role='textbox'], input[type='url'], input[type='email'], input[type='password'], input[type='search'], [contenteditable='true']";
-var keyboard;
+function injectPanel(){
+    
+    var panel = document.createElement('iframe');
+    panel.id = 'panel-frame';
+    panel.src = chrome.extension.getURL("panel.html");  
+    document.body.appendChild(panel);
+    
+    var style = [
+        "z-index: 100;", 
+        "background-color: rgba(255,255,255, 0.4);",
+        "position: fixed;",
+        "width: 99%;",
+        "height: 70px;",
+       // "height: auto;", //about twice too big
+        "bottom: 0px;",
+        "border: solid black 3px;"
+    ];
+    
+    var style_txt = "";
+    for (var i=0;i<style.length;i++){
+        style_txt += style[i];
+    }    
+    panel.style.cssText = style_txt;  
+    
+    var padding = document.createElement("div"); 
+    padding.id="keyboard-space-padding";
+    $(padding).height(panel.style.height);
+    $('body').append(padding);
+}
+
 function injectKeyboard(){ 
-    keyboard = document.createElement("iframe"); 
+    var keyboard = document.createElement("iframe"); 
     keyboard.id = 'keyboard-frame';
     keyboard.src = chrome.extension.getURL("keyboard.html"); 
  
@@ -32,6 +60,32 @@ function injectKeyboard(){
         }
     });
 }
+
+function injectMyStyles(){
+    addStyle('.active-text-field', '{border: solid orange 3px !important;}');
+    addStyle('.visible-section', '{border: solid purple 3px !important;}');
+    addStyle('.active-section .conceptual-sub-section', '{border: solid mediumseagreen 3px;}'); 
+    addStyle('.conceptual-sub-section .conceptual-sub-section', '{border: none !important;}');
+    //addStyle('.conceptual-sub-section .conceptual-sub-section .conceptual-sub-section', '{border: "" ;}'); 
+    
+    addStyle('.active-section', '{border: solid orchid 5px !important;}');
+}
+
+function addStyle(selector, style_rules){ //strings
+    var rule = document.createElement('style');
+    rule.type = 'text/css';
+    rule.textContent = (selector + " " + style_rules);
+    document.head.appendChild(rule);
+}
+
+document.addEventListener("DOMContentLoaded", injectKeyboard(), false);
+document.addEventListener("DOMContentLoaded", injectPanel(), false);
+document.addEventListener("DOMContentLoaded", injectMyStyles(), false);
+
+
+/* IMPLEMENTING TYPING, KEYBOARD, AND TEXT INPUT */
+
+var text_selector = ":text, textarea, input[role='textbox'], input[type='url'], input[type='email'], input[type='password'], input[type='search'], [contenteditable='true']";
 
 var txt_field; //jQuery object, keep for backup in case the active class is lost?
 var txt_index;
@@ -85,7 +139,7 @@ function nextInput(){
 function closeKeyboard(){
     $("#keyboard-frame").hide();
     $("#keyboard-space-padding").height($('#panel-frame').height());
-    chrome.runtime.sendMessage("refocus");        
+    chrome.runtime.sendMessage("panel focus");        
 }
 
 function typeToInput(key){
@@ -109,9 +163,23 @@ function typeToInput(key){
     txt_field.val(val);
 }
 
-//return DOM of closest 'submit' button to txt_field by midpoint
-function findSubmit(){    
-    var submits = $(':submit');
+function submitInput(){
+    closeKeyboard(); 
+    try {
+        var button = findClosestSubmit(':submit:visible');
+        console.log(button);
+        button.click();
+    }
+    catch(err) { //no visible submits
+
+        var form = findClosestSubmit('form');
+        console.log(form);
+        form.submit();
+    }
+}
+
+function findClosestSubmit(selector){ //return 'submit' closest to txt_field  
+    var submits = $(selector);
     
     var min_dist = getDistanceBetweenEls(txt_field[0], submits[0]);
     var closest_submit = submits[0];
@@ -127,100 +195,11 @@ function findSubmit(){
     return closest_submit;
 }
 
-function injectPanel(){
-    
-    var panel = document.createElement('iframe');
-    panel.id = 'panel-frame';
-    panel.src = chrome.extension.getURL("panel.html");  
-    document.body.appendChild(panel);
-    
-    var style = [
-        "z-index: 100;", 
-        "background-color: rgba(255,255,255, 0.4);",
-        "position: fixed;",
-        "width: 99%;",
-        "height: 70px;",
-       // "height: auto;", //about twice too big
-        "bottom: 0px;",
-        "border: solid black 3px;"
-    ];
-    
-    var style_txt = "";
-    for (var i=0;i<style.length;i++){
-        style_txt += style[i];
-    }    
-    panel.style.cssText = style_txt;  
-    
-    var padding = document.createElement("div"); 
-    padding.id="keyboard-space-padding";
-    $(padding).height(panel.style.height);
-    $('body').append(padding);
-}
 
-function injectMyStyles(){
-    addStyle('.active-text-field', '{border: solid orange 3px !important;}');
-    addStyle('.visible-section', '{border: solid purple 3px !important;}');
-    addStyle('.active-section .conceptual-sub-section', '{border: solid mediumseagreen 3px;}'); 
-    addStyle('.conceptual-sub-section .conceptual-sub-section', '{border: none !important;}');
-    //addStyle('.conceptual-sub-section .conceptual-sub-section .conceptual-sub-section', '{border: "" ;}'); 
-    
-    addStyle('.active-section', '{border: solid orchid 5px !important;}');
-}
+/* SECTION MAPPING AND NAVIGATION */
 
-function addStyle(selector, style_rules){ //strings
-    var rule = document.createElement('style');
-    rule.type = 'text/css';
-    rule.textContent = (selector + " " + style_rules);
-    document.head.appendChild(rule);
-}
-
-document.addEventListener("DOMContentLoaded", injectKeyboard(), false);
-document.addEventListener("DOMContentLoaded", injectPanel(), false);
-document.addEventListener("DOMContentLoaded", injectMyStyles(), false);
-
-function scrollWindow(direction){
-    var scroll = $(document).scrollTop();
-    switch(direction){
-        case 'up': scroll -= window.innerHeight*0.8; break;
-        case 'down': scroll += window.innerHeight*0.8; break;
-        case 'top': scroll = 0; break;
-        case 'bottom': scroll = document.body.scrollHeight; break;                
-    }
-    $(document).scrollTop(scroll);
-}
-
-function isVisible(element){ //DOM element
-    var rect = element.getBoundingClientRect();
-    var offset = 0;
-
-    if ($('#keyboard-frame').is(':visible')){
-        offset = $('#keyboard-frame').height();
-    }
-    return (rect.bottom > 0) //false if element above screen
-            && (rect.top + offset <window.innerHeight - $('#keyboard-space-padding').height()) //false if below screen
-            && (rect.right>0)
-            && (rect.left<window.innerWidth)
-            && (window.getComputedStyle(element)
-                .getPropertyValue('visibility') !== 'hidden')
-            && (window.getComputedStyle(element)
-                .getPropertyValue('opacity') > 0)
-            && ($(element).is(':visible'))
-            //deal with element being overlapped by another
-        ; 
-}
-
-function getDistanceBetweenEls(el1, el2){
-    var rect1 = el1.getBoundingClientRect();
-    var rect2 = el2.getBoundingClientRect();
-    
-    var rect1_mid = [(rect1.left+rect1.right)/2, 
-                (rect1.top+rect1.bottom)/2];
-    var rect2_mid = [(rect2.left+rect2.right)/2, 
-                (rect2.top+rect2.bottom)/2];
-    var a = rect1_mid[0]-rect2_mid[0];
-    var b = rect1_mid[1]-rect2_mid[1];
-    return Math.sqrt(a*a+b*b);
-}
+var interaction_selectors = "a:visible, input:visible, button:visible";
+var first_interaction_selectors = "a:first-of-type:visible, input:first-of-type:visible, button:first-of-type:visible";
 
 var active_section_index;
 function moveSection(forward){  //boolean for next section or prev section   
@@ -359,9 +338,6 @@ function isSmallEnough(element){
     return !(result);
 }
 
-var interaction_selectors = "a:visible, input:visible, button:visible";
-var first_interaction_selectors = "a:first-of-type:visible, input:first-of-type:visible, button:first-of-type:visible";
-
 function mapDOM(){
     sectionOff('header');
     sectionOff('footer');
@@ -464,11 +440,71 @@ function tabLinks(section){ //makes each link in the jquery object a sub-section
     section.find(interaction_selectors).addClass('conceptual-sub-section');
 }
 
+
+/* OTHER FUNCTIONS */
+
+function scrollWindow(direction){
+    var scroll = $(document).scrollTop();
+    switch(direction){
+        case 'up': scroll -= window.innerHeight*0.8; break;
+        case 'down': scroll += window.innerHeight*0.8; break;
+        case 'top': scroll = 0; break;
+        case 'bottom': scroll = document.body.scrollHeight; break;                
+    }
+    $(document).scrollTop(scroll);
+}
+
+function isVisible(element){ //DOM element
+    var rect = element.getBoundingClientRect();
+    var offset = 0;
+
+    if ($('#keyboard-frame').is(':visible')){
+        offset = $('#keyboard-frame').height();
+    }
+    return (rect.bottom > 0) //false if element above screen
+            && (rect.top + offset <window.innerHeight - $('#keyboard-space-padding').height()) //false if below screen
+            && (rect.right>0)
+            && (rect.left<window.innerWidth)
+            && (window.getComputedStyle(element)
+                .getPropertyValue('visibility') !== 'hidden')
+            && (window.getComputedStyle(element)
+                .getPropertyValue('opacity') > 0)
+            && ($(element).is(':visible'))
+            //deal with element being overlapped by another
+        ; 
+}
+
+function getDistanceBetweenEls(el1, el2){
+    var rect1 = el1.getBoundingClientRect();
+    var rect2 = el2.getBoundingClientRect();
+    
+    var rect1_mid = [(rect1.left+rect1.right)/2, 
+                (rect1.top+rect1.bottom)/2];
+    var rect2_mid = [(rect2.left+rect2.right)/2, 
+                (rect2.top+rect2.bottom)/2];
+    var a = rect1_mid[0]-rect2_mid[0];
+    var b = rect1_mid[1]-rect2_mid[1];
+    return Math.sqrt(a*a+b*b);
+}
+
+function regainFocus(){
+    //hopefully this means the focus is in an iframe? Might not be mine though
+    if ($(':focus').is(text_selector)){
+        chrome.runtime.sendMessage("open"); 
+    } else if (typeof document.activeElement == 'undefined'){
+        //console.log($(':focus')[0]);
+        chrome.runtime.sendMessage("panel focus"); 
+    }   
+}
+
 chrome.runtime.onMessage.addListener( //from the background page
   function(message, sender, sendResponse) {
     window.find(message, false, false, true, false, false,true);
 });
 
+
+/* MAIN FUNCTION SWITCH */
+ 
 window.addEventListener("message", function(event){
     var my_origin = chrome.extension.getURL("");
     my_origin = my_origin.substring(0, my_origin.length-1); //remove slash at the end
@@ -477,7 +513,7 @@ window.addEventListener("message", function(event){
         switch(event.data){
                 
             //from keyboard iframe
-            case 'submit':  closeKeyboard(); findSubmit().click();   break;
+            case 'submit': submitInput(); break;
             case 'close': closeKeyboard();  break;
             case 'next-input': nextInput(); break;
                 
@@ -490,14 +526,7 @@ window.addEventListener("message", function(event){
             case 'back-section': backSection(); break;
             case 'unmap-sections': unmapDOM(); break;
             case 'open': openKeyboard(); break;
-            case 'lost focus':
-                if (!($(':focus').is(text_selector) 
-                     || (typeof $(':focus')[0] == 'undefined') //hopefully this means the focus is in an iframe? Might not be mine though
-                     )){
-                    //console.log($(':focus')[0]);
-                    chrome.runtime.sendMessage("refocus"); 
-                }
-                break;
+            case 'lost focus': regainFocus(); break;
             case 'back': window.history.back(); break;
             case 'forward': window.history.forward(); break;
                 
@@ -512,31 +541,35 @@ window.addEventListener("message", function(event){
 
 /*  
 
-Possible:
-    -have ctrl panel/keyboard idle-fade?
-    -replace focus-reliance with a class?
-    -section navigation: grey out non-active sections?
+User guidance:
+- refresh page for settings to take effect (can I fix this with an onChanged listener?)
+- sometimes subsections will be outside the super-section
+- sometimes sections are invisible, just tap past them
+
+Bugs:
+- can't cancel out of the Change Url popup right now
+- querying the active tab only works if 1 window open
+- email sites often don't work
 
 To do now:    
     -make explanatory webpage / demo
     -autoscan w/ variable speed
-    -variable key codes and typing abilities in popup.js
         
+Possible:
+    -have ctrl panel/keyboard idle-fade?
+    -replace focus-reliance with a class?
+    -section navigation: grey out non-active sections?
+    
 To do later:
-    -querying the active tab only works if 1 window open
     -improve sectioning heuristics (always)
     -add bookmarking functions
-    -other browser/window controls (larger history, window resizing/snapping/manipulation, volume controls)
+    -other browser/window controls (window resizing/snapping/manipulation, volume controls)
     -connect the "search" function with link selection
     -allow user to create page-specific buttons for common actions
     -store keyboards as json objects and allow different layouts
     -clean/refactor/improve efficiency of code
+    -more possible selectors for submit buttons
 
-Ongoing issues:
--email sites don't work
--more possible selectors for submit buttons
-
-https://github.com/jjallen37/ChromeFormSwitch
 https://object.io/site/2011/enter-git-flow/
 mousetrap (create keyboard shortcuts) 
 -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver

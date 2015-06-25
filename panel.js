@@ -13,10 +13,18 @@ function setFirstSiblingFocus(button){$(button).parent().children().first().focu
  
 function setUpNavigation(){
     chrome.storage.sync.get({
+        autoscan: false,
+        scan_rate: 3,
         scan_code: 9, 
         select_code: 13
     }, function(items){
 
+    if (items.autoscan){
+        
+        
+    } else {
+        
+        
     $('button').keydown(function(e){
         e.stopPropagation();
         if (e.which == items.select_code){
@@ -52,6 +60,8 @@ function setUpNavigation(){
         }
     });
         
+    } //end auto-scan off condition
+        
     });
 }
 
@@ -78,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
         switch(message){
-            case "refocus":
+            case "panel focus":
                 setFirstSectionFocus(); 
                 break;
             case "sectioning-on":
@@ -90,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('#interaction-controls button').hide();
                 $('#map-sections').show();
                 $('#map-sections').text("Section the page");
-                $('#map-sections').focus();
+                $('#interaction-controls').focus();
                 break;              
         }
        
