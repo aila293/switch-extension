@@ -5,87 +5,80 @@ function setTabIndex(){
     });
 }
 
-function setFirstSectionFocus(){$('section').first().focus();}
-function setNextSectionFocus(section){$(section).next().focus();};
-function setParentFocus(button){$(button).parent().focus();}
-function setChildFocus(section){$(section).children().first().focus();}
-function setFirstSiblingFocus(button){$(button).parent().children().first().focus();}
- 
-function setUpNavigation(){
-    chrome.storage.sync.get({
-        autoscan: false,
-        scan_rate: 3,
-        scan_code: 9, 
-        select_code: 13
-    }, function(items){
+function setFirstSectionFocus(){
+    $('section').first().focus();
+}
 
-    if (items.autoscan){
-        
-        
-    } else {
-        
-        
-    $('button').keydown(function(e){
+function setUpNavigation(){
+    initiateAutoscan(function(){
+        $('button,section').keydown(function(e){
+            processKeydown(e);    
+        });   
+    }, processKeydown);
+};
+
+function processKeydown(e){
         e.stopPropagation();
-        if (e.which == items.select_code){
-            window.parent.postMessage(this.id, "*")
-            setFirstSiblingFocus(this);
-        } else if (e.which == items.scan_code){
-            e.preventDefault();
-            if ($(this).next().length == 0){
-                setParentFocus(this);
+        e.preventDefault();    
+        var target = e.target;
+        
+        if (e.which == settings.select_code){
+            
+            if (!(autoscan_on)){ 
+                startScan(); 
             } else {
-                $(this).next().focus();
+                
+            if (target.tagName == 'BUTTON'){
+                window.parent.postMessage(target.id, "*")
+                $(target).prevAll().last().focus();
+                stopScan();
+
+            } else { //section
+                if (target.id=='interaction-controls'
+                && !($('#next-section').is(':visible'))){
+                    window.parent.postMessage("map-sections", "*");
+                    
+                } else {
+                    $(target).children().first().focus();
+                }
+                resetTime();
             }
-        }
-    });
-    
-    $('section').keydown(function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        
-        if (e.which == items.select_code){
-            if (this.id=='interaction-controls'
-               && !($('#next-section').is(':visible'))){
-                window.parent.postMessage("map-sections", "*")
-            } else {
-                setChildFocus(this);    
+                
             }
-        } else if (e.which == items.scan_code){
-            if ($(this).next().length == 0){
-                setFirstSectionFocus();
+            
+        } else if (e.which == settings.scan_code){
+            var next = $(target).next();
+            if (next.length == 0){
+                if (target.tagName == 'BUTTON'){
+                    $(target).parent().focus();
+                } else {
+                    setFirstSectionFocus();
+                }
             } else {
-                setNextSectionFocus(this);
-            }            
-        }
-    });
-        
-    } //end auto-scan off condition
-        
-    });
+                next.focus();
+            }
+        }        
+     
+    }
+
+function blurHandler(){
+    window.setTimeout(function(){
+        if ($(':focus').length == 0){   
+            window.parent.postMessage("lost focus", "*");
+            //routes to content script for page access, 
+            //then to background to respond to this frame
+        } 
+    }, 300); //wait for the new element to get the focus
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-//window.addEventListener('load', function() {
-
     setTabIndex();
-    
     setUpNavigation();
-    
     setFirstSectionFocus();
-    
     $('#interaction-controls').children().first().hide();
     
-    $('*').blur(function(){
-        window.setTimeout(function(){
-            if ($(':focus').length == 0){
-                window.parent.postMessage("lost focus", "*");
-                //routes to content script for page access, 
-                //then to background to respond to this frame
-            }
-        }, 300); //wait for the new element to get the focus
-    });
-    
+    $('*').blur(blurHandler);
+
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
         switch(message){
             case "panel focus":
@@ -95,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('#interaction-controls button').show();
                 $('#map-sections').text("Re-section the page");
                 $('#next-section').focus();
+                stopScan();
                 break;
             case "sectioning-off":
                 $('#interaction-controls button').hide();

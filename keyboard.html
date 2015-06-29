@@ -18,10 +18,9 @@
         }
         span:focus {
             color: red;
+            border: none;
         }
-        div:focus, section:focus, button:focus{
-            border: solid red 3px;
-        }
+        
         section{
             display: inline-block;
             padding-right: 15px;
@@ -29,23 +28,17 @@
         #symbols_div{
             display: none;
         }
-/*
-        button#top {
-            display: none; if the frame starts at the top
-        }  
-*/
         
     </style>
     
+    <script src="autoscan.js"></script>  
     <script src="keyboard.js"></script>  
     <script src="jquery-1.11.3.min.js"></script>
 
 </head>
   
 <body>
-<!--    <div id='keyboard'>-->
-<!--        <textarea type='text' id='text'></textarea>-->
-    
+
     <div tabindex='0' id='letters_div'>
         <section id="letters1" tabindex='1'></section>
         <section id="letters2" tabindex='10'></section>
@@ -76,7 +69,6 @@
         <button id='clear' tabindex='158'>Clear this field</button> 
         <button id='close' tabindex='162'>Close Keyboard</button>
     </div>
-<!--    </div>-->
 
 </body>
 

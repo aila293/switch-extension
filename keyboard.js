@@ -56,67 +56,71 @@ function processButton(id){
     }
 }
 
-var caps_on = false;
+function processKeydown(e){
+    e.stopPropagation();
+    e.preventDefault();
+    var target = e.target;
 
+    if (e.which == settings.scan_code){
+        var next = $(target).next();
+        if (!(next.is(':visible'))){next = next.next();}
+
+        if (next.length==0){
+            if (target.tagName == 'DIV'){
+                next = $('div').first();
+            } else {
+                next = $(target).parent();
+            }
+        }
+        next.focus();
+
+    } else if (e.which == settings.select_code){
+         if (!(autoscan_on)){ 
+            startScan(); 
+        } else {
+    
+        resetTime();
+
+        switch(target.tagName){
+
+            case 'DIV': case 'SECTION':
+                $(target).children()[0].focus();
+                break;
+            case 'BUTTON': processButton(target.id); break;
+            case 'SPAN':   
+                window.parent.postMessage(target.innerText, "*");  
+
+                if ($(target).closest('div')[0].id=='letters_div'){
+                    $('#letters_div').children()[0].focus();
+                } else {
+                    resetFocus(); 
+                }
+
+                if (caps_on){
+                    caps_on=false;
+                    updateLetters();
+                } 
+                break;
+        }
+            
+        }
+    }
+}
+
+var caps_on = false;
 document.addEventListener('DOMContentLoaded', function() {
     loadKeys(letters, $('#letters1'), 2);
     loadKeys(punctuation, $('#punctuation1'), $('#punctuation1')[0].tabIndex + 1);
     loadKeys(symbols, $('#symbols1'), $('#symbols1')[0].tabIndex + 1)
     
-    chrome.storage.sync.get({
-        scan_code: 9, 
-        select_code: 13
-    }, function(items){
-       
-    $('div,section,button,span').keydown(function(e){
-        e.stopPropagation();
-        e.preventDefault();
-       
-        if (e.which == items.scan_code){
-            var next = $(this).next();
-
-            if (!(next.is(':visible'))){next = next.next();}
-
-            if (next.length==0){
-                if ($(this).is('div')){
-                    next = $('div').first();
-                } else {
-                    next = $(this).parent();
-                }
-            }
-            
-            next.focus();
-        
-        } else if (e.which == items.select_code){
-
-            switch(this.tagName){
-                case 'DIV': case 'SECTION':
-                    $(this).children()[0].focus();
-                    break;
-                case 'BUTTON': processButton(this.id); break;
-                case 'SPAN':   
-                    window.parent.postMessage(this.innerText, "*");  
-                    
-                    if ($(this).closest('div')[0].id=='letters_div'){
-                        $('#letters_div').children()[0].focus();
-                    } else {
-                        resetFocus(); 
-                    }
-                    
-                    if (caps_on){
-                        caps_on=false;
-                        updateLetters();
-                    } 
-                    break;
-            }
-        }
-    });
-        
-    });
+    initiateAutoscan(function(){
+        $('div, section, button, span').keydown(function(e){
+            processKeydown(e);    
+        });
+    }, processKeydown);
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-//     console.log(message);
-        if (message === 'open'){
+        if (message === 'keyboard focus'){
             resetFocus(); 
         }  
     });

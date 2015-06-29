@@ -3,15 +3,19 @@
 <head>
     <title> Options </title>
     <style>
-        :focus {
-            border: solid red 3px !important;
-        }
+
         body{
             font-size: 18px;
             line-height: 40px;
         }
+     
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
     </style>
     
+    <script src="autoscan.js"></script>  
     <script src="options.js"></script>  
     <script src="jquery-1.11.3.min.js"></script>
 </head>
@@ -25,8 +29,11 @@
         <input type="radio" name="auto-scan" value="off" checked> Off 
     </section>
     
-    <section id='scanrate'>Scan rate:
-        <input type="number" name="scan-rate" min="0" >
+    <section id='scanrate'>Scan rate (in seconds): 
+        <span id='scan_value'></span>
+        <button id='increase'> Increase </button>
+        <button id='decrease'> Decrease </button>
+        
     </section> <br>
     
     <section>
@@ -44,17 +51,10 @@
     </section> <br>
     
     <section>
-        Built-in Keyboard: 
-        <input type="radio" name="keyboard" value="on"> On
-        <input type="radio" name="keyboard" value="off" checked> Off 
-    </section> <br>
-    
-    <section>
         Choose what page to open new tabs on: <br>
          <input type="radio" name="newtab-page" value="https://www.google.com"> Google.com <br>
         <input type="radio" name="newtab-page" value="chrome://newtab"> Chrome's default "New Tab" page <br>
         <input type="radio" name="newtab-page" value="other"> Custom URL: <input name='custom-url'>  
-<!-- appear if this option is checked-->
     </section> <br>
         
     <section>
@@ -63,7 +63,7 @@
     </section> <br>
     
     <section>
-        <button id='return'>Close this page</button>
+        <button id='exit'>Close this page</button>
     </section>
 
 </form>

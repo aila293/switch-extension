@@ -54,20 +54,14 @@ function injectKeyboard(){
     keyboard.style.cssText = style_txt;    
     document.documentElement.appendChild(keyboard); 
     
-    chrome.storage.sync.get({keyboard: false}, function(items){
-        if (items.keyboard){
-            $(text_selector).focus(openKeyboard);
-        }
-    });
+    $(text_selector).focus(openKeyboard);
 }
 
 function injectMyStyles(){
     addStyle('.active-text-field', '{border: solid orange 3px !important;}');
+    
     addStyle('.visible-section', '{border: solid purple 3px !important;}');
     addStyle('.active-section .conceptual-sub-section', '{border: solid mediumseagreen 3px;}'); 
-    addStyle('.conceptual-sub-section .conceptual-sub-section', '{border: none !important;}');
-    //addStyle('.conceptual-sub-section .conceptual-sub-section .conceptual-sub-section', '{border: "" ;}'); 
-    
     addStyle('.active-section', '{border: solid orchid 5px !important;}');
 }
 
@@ -82,58 +76,52 @@ document.addEventListener("DOMContentLoaded", injectKeyboard(), false);
 document.addEventListener("DOMContentLoaded", injectPanel(), false);
 document.addEventListener("DOMContentLoaded", injectMyStyles(), false);
 
-
 /* IMPLEMENTING TYPING, KEYBOARD, AND TEXT INPUT */
 
 var text_selector = ":text, textarea, input[role='textbox'], input[type='url'], input[type='email'], input[type='password'], input[type='search'], [contenteditable='true']";
 
-var txt_field; //jQuery object, keep for backup in case the active class is lost?
-var txt_index;
 function openKeyboard(){
+    var inputs = $(text_selector);
+    var active_field = $('.active-text-field');
 
-    if (event.currentTarget == window){ //opened from button
-        if ($('.active-text-field').length == 0){ //no active field
-            var inputs = $(text_selector);
-            txt_index = 0;
-            while (!(isVisible(inputs[txt_index]))){
+    if (event.currentTarget == window){ //"Open Keyboard" button
+        if (active_field.length == 0){ //no active field
+            var txt_index = 0;
+            while (!( $(inputs[txt_index]).is(':visible'))){
                 txt_index++;
-                if (txt_index==inputs.length){txt_index=0;}
+//                if (txt_index==inputs.length){txt_index=0;}
             }
+            $(inputs[txt_index]).addClass('active-text-field');
+
         } //else stay at last active field
-    } else { //if opened from focus on text field
-        txt_index = $(text_selector).index(event.currentTarget);
-        $('.active-text-field').removeClass('active-text-field');
+    } else { //focus on text field
+        active_field.removeClass('active-text-field');
+        $(event.currentTarget).addClass('active-text-field');
     }
-    
-    txt_field =  $($(text_selector)[txt_index]);
-    txt_field.addClass('active-text-field');
-    console.log(txt_field[0]);
-    
+        
+    //display the keyboard
     if ($("#keyboard-frame")[0].style.display == 'none'){
         $("#keyboard-frame").show();
        var height = $("#keyboard-frame").height();
         $("#keyboard-space-padding").height(height);
         
-        chrome.runtime.sendMessage("open");
+        chrome.runtime.sendMessage("keyboard focus");
     }
+    
+    scrollToView($('.active-text-field'));
 }
 
 function nextInput(){
     var inputs = $(text_selector);
-    txt_index++;
-    if (txt_index == inputs.length){
-        txt_index=0;
+    var active_field = $('.active-text-field');
+    var next_index = inputs.index(active_field[0]) + 1;
+    if (next_index == inputs.length){
+        next_index=0;
     }
     $('.active-text-field').removeClass('active-text-field');
-    $(inputs[txt_index]).addClass('active-text-field');
-    txt_field = $('.active-text-field');
-    console.log(inputs[txt_index]);
+    $(inputs[next_index]).addClass('active-text-field');
     
-    //test if on screen, if not scroll to place
-    if (!(isVisible($('.active-text-field')[0]))){
-        var pos = $('.active-text-field').offset().top - 100;
-        $(document).scrollTop(pos);
-    }
+    scrollToView($('.active-text-field'));
 }
 
 function closeKeyboard(){
@@ -143,6 +131,7 @@ function closeKeyboard(){
 }
 
 function typeToInput(key){
+    var txt_field = $('.active-text-field');
     var val = txt_field.val();
     switch(key){
         case 'backspace':
@@ -165,36 +154,36 @@ function typeToInput(key){
 
 function submitInput(){
     closeKeyboard(); 
+    
     try {
-        var button = findClosestSubmit(':submit:visible');
-        console.log(button);
-        button.click();
-    }
-    catch(err) { //no visible submits
-
         var form = findClosestSubmit('form');
-        console.log(form);
-        form.submit();
+        form.submit();   
+    }
+    catch(err) { //no form
+        var button = findClosestSubmit(':submit:visible');
+        button.click();
     }
 }
 
-function findClosestSubmit(selector){ //return 'submit' closest to txt_field  
+function findClosestSubmit(selector){ //return 'submit' closest to active text field  
     var submits = $(selector);
+    var text = $('.active-text-field');
+    console.log(text[0]);
     
-    var min_dist = getDistanceBetweenEls(txt_field[0], submits[0]);
+    var min_dist = getDistanceBetweenEls(text[0], submits[0]);
     var closest_submit = submits[0];
     
     submits.each(function(){
-        var dist = getDistanceBetweenEls(txt_field[0], this);
+        var dist = getDistanceBetweenEls(text[0], this);
         if (dist < min_dist) {
             min_dist = dist;
             closest_submit = this;
         }
     });
     //if none found, try last child of <form>?, id with 'submit' in it
+    console.log(closest_submit)
     return closest_submit;
 }
-
 
 /* SECTION MAPPING AND NAVIGATION */
 
@@ -231,10 +220,7 @@ function moveSection(forward){  //boolean for next section or prev section
         mapSection(next_section);
     }
     
-    if (!(isVisible(next_section[0]))){
-        $(document).scrollTop(next_section.offset().top - 100);
-    }   
-    
+    scrollToView(next_section);
 }
 
 function selectSection(){
@@ -257,8 +243,8 @@ function selectSection(){
         var new_section = sub_sections.first();
         new_section.addClass('active-section');
         mapSection(new_section);
+        active_section_index=0;
     }                            
-    active_section_index=0;
 }
 
 function backSection(){    
@@ -474,6 +460,13 @@ function isVisible(element){ //DOM element
         ; 
 }
 
+function scrollToView($element){ //check if on screen, scroll if not
+    if (!(isVisible($element[0]))){
+        var pos = $element.offset().top - 100;
+        $(document).scrollTop(pos);
+    }
+}
+
 function getDistanceBetweenEls(el1, el2){
     var rect1 = el1.getBoundingClientRect();
     var rect2 = el2.getBoundingClientRect();
@@ -488,13 +481,15 @@ function getDistanceBetweenEls(el1, el2){
 }
 
 function regainFocus(){
-    //hopefully this means the focus is in an iframe? Might not be mine though
-    if ($(':focus').is(text_selector)){
-        chrome.runtime.sendMessage("open"); 
-    } else if (typeof document.activeElement == 'undefined'){
-        //console.log($(':focus')[0]);
+    var focus = document.activeElement;
+        
+    if  ($(focus).is(text_selector)
+        || $('#keyboard-frame')[0].style.display != 'none'){
+        chrome.runtime.sendMessage("keyboard focus");         
+    } else {
         chrome.runtime.sendMessage("panel focus"); 
-    }   
+    } 
+    //} else if (typeof focus == 'undefined'){ //in an iframe?
 }
 
 chrome.runtime.onMessage.addListener( //from the background page
@@ -541,34 +536,44 @@ window.addEventListener("message", function(event){
 
 /*  
 
+To do now: 
+    -make explanatory webpage/demo
+
+Autoscan system: 
+ - hit switch once to start
+ - selecting section resets interval
+ - selecting a button ends scan
+ - hit switch again to start
+
 User guidance:
 - refresh page for settings to take effect (can I fix this with an onChanged listener?)
 - sometimes subsections will be outside the super-section
-- sometimes sections are invisible, just tap past them
+- sometimes sections are invisible, just scan past them
+- if new content appears on the page, re-section to include
 
-Bugs:
-- can't cancel out of the Change Url popup right now
+Bugs/Issues:
+- can't cancel out of the Change Url popup at the moment
 - querying the active tab only works if 1 window open
 - email sites often don't work
+- on Google homepage, sometimes focus goes to panel behind keyboard
 
-To do now:    
-    -make explanatory webpage / demo
-    -autoscan w/ variable speed
-        
-Possible:
-    -have ctrl panel/keyboard idle-fade?
-    -replace focus-reliance with a class?
+Considerations:
     -section navigation: grey out non-active sections?
+    -including txt inputs in sectioning (and having the auto-open function) is unnecessary?
+        -removing this would make the text fields only accessible through the keyboard, making it harder to use other keyboards
     
 To do later:
-    -improve sectioning heuristics (always)
+    -replace focus-reliance with a class?
+    -better autoscan (with delay in beginning of section, different times for sections vs single elements)
+    -detect http/https errors (maybe not important because google)
+    -improve sectioning heuristics?
     -add bookmarking functions
     -other browser/window controls (window resizing/snapping/manipulation, volume controls)
     -connect the "search" function with link selection
     -allow user to create page-specific buttons for common actions
     -store keyboards as json objects and allow different layouts
     -clean/refactor/improve efficiency of code
-    -more possible selectors for submit buttons
+    -more options for auto-submit 
 
 https://object.io/site/2011/enter-git-flow/
 mousetrap (create keyboard shortcuts) 

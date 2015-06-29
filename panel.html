@@ -10,14 +10,12 @@
             display: inline-block;
             margin-right: 70px;
         }
-        :focus {
-            border: solid red 3px !important;
-        }
         #interaction-controls button:not(#map-sections){
             display: none;
         }
     </style>
     
+    <script src="autoscan.js"></script>  
     <script src="panel.js"></script>  
     <script src="jquery-1.11.3.min.js"></script>
 
@@ -46,11 +44,11 @@
     </section>
     
     <section id='page-controls'>
-        <button id='change-url'>Change URL</button>
         <button id='reload'> Reload Page </button>
         <button id='new-tab'> New Tab </button>
         <button id='close-tab'> Close Tab </button>
         <button id='change-tab'> Change Tab </button>
+        <button id='change-url'>Navigate to URL</button>
     </section>
     
     <section id='other-controls'>
@@ -61,18 +59,6 @@
         <button id='zoom-out'> Zoom Out </button>
     </section>
         
-<!--    
-        <section>
-    //Slightly less useful tab operations
-        <button id='close-other-tabs'> Close all other tabs
-        </button>
-        <button id='copy-tab'> Duplicate tab </button>
-        <button id='pin-tab'> Pin tab </button>
-        <button id='unpin-tab'> Unpin tab </button>
-        <button id='move-tab'> Move tab </button>
-
-    </section>
--->
 <!--
 //Not useful until ability to snap windows to sides is implemented
     <section id="window-controls">

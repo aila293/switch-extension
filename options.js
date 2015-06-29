@@ -12,10 +12,9 @@ function saveOptions(event) {
         
     chrome.storage.sync.set({
         autoscan: $('[name="auto-scan"]:checked').val() == "on",
-        scan_rate: $('[name="scan-rate"]').val(),
+        scan_rate: parseFloat($('#scan_value').text()),
         scan_code: $('span.scan')[0].id,
         select_code: $('span.select')[0].id,
-        keyboard: $('[name="keyboard"]:checked').val() == "on",
         newtab_url: url, 
         newtab_index: url_index
     }, function() {
@@ -23,8 +22,10 @@ function saveOptions(event) {
         setTimeout(function() {
           $('#status').text('');
         }, 2000);
+
+        stopScan();
     });
-    //navigate this window to the newtab page
+    
 }
 
 function adaptAutoscan(autoscan){
@@ -43,84 +44,95 @@ function adaptAutoscan(autoscan){
 function restoreOptions() {
     chrome.storage.sync.get({ //with default values
         autoscan: false,
-        scan_rate: 3,
+        scan_rate: 2,
         scan_code: 9, //tab
         select_code: 13, //enter
-        keyboard: false, 
         newtab_url: "https://www.google.com", 
         newtab_index: 0
     }, function(items) {
         adaptAutoscan(items.autoscan);
         
         //fill in scan/select key info
-        
         $('span.scan')[0].id = items.scan_code;
         $('span.select')[0].id = items.select_code;
         $('span.scan').text(keyCodeMap[items.scan_code] + "  ");
         $('span.select').text(keyCodeMap[items.select_code]+ "  ");
+        $('span#scan_value').text(items.scan_rate);
 
-        var keyboard_val = items.keyboard ? "on" : "off";
-        $('[name="keyboard"][value="'+keyboard_val+'"]')[0].checked=true;
-        $('input[name="scan-rate"]').val(items.scan_rate);
         $('input[name="newtab-page"]')[items.newtab_index].checked=true;
+        $('input[name="custom-url"]').val(items.newtab_url);
     });
+}
+
+function processKeydown(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!(autoscan_on)){
+        startScan();
+    } else {
+        
+    var section = e.target.tagName == 'SECTION';
+        
+    if (e.which == settings.scan_code){
+        if (section){
+            var all_sections = $( "section:visible" );
+            var i = all_sections.index( e.target ) ;
+            var next = all_sections[++i];
+            if (i== all_sections.length){i=0;} //rollover
+            $(all_sections[i]).focus();                    
+        } else {
+            var index = $("input:visible, button:visible").index(e.target);
+            var next = $("input:visible, button:visible")[index+1];
+
+            //if "next" is not in the same section
+            var this_section = $(e.target).closest('section')[0];
+            if ($(next).closest('section')[0] == this_section){
+                $(next).focus();
+            } else {
+               $(this_section).focus();
+            }
+        }
+
+    } else if (e.which == settings.select_code){
+        if (section){
+            var inputs = $(e.target).find('input,button');
+            if (inputs.length == 1){
+                inputs[0].click();
+                resetTime();
+            } else { //applies to the "key inputs" section only
+                $(e.target).find('input,button:visible').first().focus();
+                resetTime();
+            }
+        } else {
+            stopScan();
+            e.target.click();
+            if (e.target.name=='custom-url'){
+                chrome.windows.create({'url': 'popup.html?newtaburl', 'width': 600, 'height': 400, 'type': 'popup'}, function(window) {}); 
+            }
+        }
+    }
+    }
 }
 
 function setupNavigation(){
     var i=1;
     $('section, input, button').each(function(){this.tabIndex = i++;});
-    
     $('section').first().focus();
     
-    chrome.storage.sync.get({
-        scan_code: 9, 
-        select_code: 13
-    }, function(items){
-    
-    $('section').keydown(function(e){
-        e.preventDefault();
-        if (e.which == items.scan_code){
-            e.stopPropagation();
-    
-            //:visible to exclude hidden scan-related optiosn
-            var i = $( "section:visible" ).index( this ) ;
-            var next = $('section:visible')[++i];
-            if (i== $('section:visible').length){i=0;} //rollover
-            $($('section:visible')[i]).focus();
-        } else if (e.which == items.select_code){
-            var inputs = $(this).find('input,button');
-            if (inputs.length == 1){
-                if (inputs[0].type == "number"){
-                    $(inputs[0]).focus();
-                } else {
-                    inputs[0].click();
-                }
-            } else { //applies to the "key inputs" section only
-                $(this).find('input,button:visible').first().focus();
-            }
-        }
-    });
-        
-    $('input,button').keydown(function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.which == items.scan_code){
-            
-            var next = $("input, button")[ $("input, button").index(this) + 1];
-            
-            //if "next" is not in the same section
-            if ($(next).closest('section')[0] == $(this).closest('section')[0]){
-                $(next).focus();
-            } else {
-                $(this).closest('section').focus();
-            }
-            
-        } else if (e.which == items.select_code){
-            this.click();
-        }
-    });
-        
-    });
+    initiateAutoscan(function(){
+        $('section, input, button').keydown(function(e){
+            processKeydown(e);
+        });
+    }, processKeydown);
+}
+
+function adjustScanRate(e, increment){
+    e.preventDefault();
+    var span = $('#scan_value');
+    var val = parseFloat(span.text());
+    val = (increment ? val+.5 : val-.5);
+    span.text(val);    
 }
 
 function setupPage(){
@@ -128,11 +140,13 @@ function setupPage(){
     setupNavigation();
     
     $('#save').click(saveOptions);
-    $('#return').click(function(){
+    $('#exit').click(function(){
         chrome.tabs.query({active: true}, function(tabs){
             chrome.tabs.remove(tabs[0].id);
         }); 
     });
+    $('#increase').click(function(e){adjustScanRate(e,true);});
+    $('#decrease').click(function(e){adjustScanRate(e,false);});
     
     $('input[name="auto-scan"]').click(function(){adaptAutoscan(this.value=="on");});
     
@@ -142,6 +156,7 @@ function setupPage(){
         else {var url = 'popup.html?selectkey'}
         chrome.windows.create({'url': url, 'width': 250, 'height': 150, 'type': 'popup'}, function(window) {}); 
     });
+    
 }
 
 document.addEventListener('DOMContentLoaded', setupPage);
@@ -150,9 +165,11 @@ window.addEventListener("message", function(event){
     if (event.data[0] == "scankey"){
         $('span.scan')[0].id = event.data[1];
         $('span.scan').text(keyCodeMap[event.data[1]] + "  ");
-    } else { //select key
+    } else if (event.data[0] == "selectkey"){
         $('span.select')[0].id = event.data[1];
         $('span.select').text(keyCodeMap[event.data[1]]+ "  ");
+    } else { //newtaburl
+         $('input[name="custom-url"]').val(event.data[1]);
     }
 });
 

@@ -54,7 +54,7 @@ chrome.runtime.onMessage.addListener( //from the content script
         switch(message){
                 
             //relay to iframes
-            case "open":
+            case "keyboard focus":
             case "panel focus":
             case "sectioning-on":
             case "sectioning-off":
@@ -81,8 +81,6 @@ chrome.runtime.onMessage.addListener( //from the content script
                                        'type': 'popup'}, function(window) {}); 
                 break;
             case 'change-tab': changeTab(); break;
-//            case 'pin-tab': chrome.tabs.update({pinned: true}); break;
-//            case 'unpin-tab': chrome.tabs.update(tabid, {pinned: false}); break;
             case 'zoom-in': case 'zoom-out': zoom(message); break;
             case 'find':
                 chrome.windows.create({'url': 'popup.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
@@ -114,16 +112,27 @@ window.addEventListener("message", function(event){
             var intended_url;
             chrome.tabs.query({active: true}, function(tabs){
                 intended_url = event.data[1];
-                chrome.tabs.update(tabs[0].id, {url: intended_url}, function(tab){
-                });
-            });
-            chrome.webNavigation.onErrorOccurred.addListener(function(details){
-                var url = details.url;
+                chrome.tabs.update(tabs[0].id, {url: intended_url}, function(tab){});
+         chrome.webRequest.onErrorOccurred.addListener(function(details){
+            console.log(details.error);
+                var url = details.url.substring(0, details.url.length-1);
                 if (url == intended_url){
                     url = url.replace("https://", "http://");
                     chrome.tabs.update(details.tabId, {url: url}, function(tab){});
                 }
+            }, {urls: ["https://*/*"]});
+                
+        chrome.webNavigation.onErrorOccurred.addListener(function(details){
+                var url = details.url.substring(0, details.url.length-1);
+    
+                if (url == intended_url){
+                    url = url.replace("https://", "http://");
+                    console.log(url);
+                    chrome.tabs.update(details.tabId, {url: url}, function(tab){});
+                }
             });
+                
+                }); //end of chrome.tabs.query
             break;            
       }
 });
