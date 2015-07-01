@@ -5,7 +5,7 @@ var keyHandler;
 
 /* include in the select_code key handler:
 
-    if (!(autoscan_on)){ 
+    if (settings.autoscan && !(autoscan_on)){ 
         startScan(); 
     } else {
 at the top 
@@ -25,6 +25,9 @@ function initiateAutoscan(callback, handler){
     }, function(items){
         settings = items; 
         keyHandler = handler;
+        if (!(settings.autoscan)){
+            showFocusStyle(); 
+        }
         callback();
     });
 }
@@ -68,15 +71,19 @@ function resetTime(){
 
 function toggleFocusStyle(){
     if (autoscan_on){
-        var style = ":focus {border: solid red 3px !important;}"; 
-        var element = document.createElement('style');
-        element.type = 'text/css';
-        element.textContent = style;
-        element.id = "focus-style";
-        document.head.appendChild(element);
+        showFocusStyle();
     } else {
         $(document.querySelector("#focus-style")).remove();
         $('#focus-style').remove();
     }
 
+}
+
+function showFocusStyle(){
+    var style = ":focus {border: solid red 3px !important;}"; 
+    var element = document.createElement('style');
+    element.type = 'text/css';
+    element.textContent = style;
+    element.id = "focus-style";
+    document.head.appendChild(element);
 }

@@ -44,6 +44,20 @@ function typeToInput(key){
     $('input').val(val);
 }
 
+function changeTabHandler(e){
+    e.preventDefault();
+    if (e.which == settings.scan_code){
+        var next = $(e.target).next();
+        if (next.length==0){
+            next = $('button').first();
+        }
+        next.focus();
+    } else if (e.which == settings.select_code){
+        background.postMessage(["change-tab", e.target.id], "*");
+        closeWindow();                     
+    }  
+}
+
 
 //purpose functions
 
@@ -93,20 +107,6 @@ function changeTab(){
         });
         startScan();
     }, changeTabHandler);
-}
-
-function changeTabHandler(e){
-    e.preventDefault();
-    if (e.which == settings.scan_code){
-        var next = $(e.target).next();
-        if (next.length==0){
-            next = $('button').first();
-        }
-        next.focus();
-    } else if (e.which == settings.select_code){
-        background.postMessage(["change-tab", e.target.id], "*");
-        closeWindow();                     
-    }  
 }
 
 function find(){

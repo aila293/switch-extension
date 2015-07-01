@@ -24,7 +24,7 @@ function processKeydown(e){
         
         if (e.which == settings.select_code){
             
-            if (!(autoscan_on)){ 
+            if (settings.autoscan && !(autoscan_on)){ 
                 startScan(); 
             } else {
                 
@@ -63,7 +63,8 @@ function processKeydown(e){
 
 function blurHandler(){
     window.setTimeout(function(){
-        if ($(':focus').length == 0){   
+        if (document.activeElement == document.body 
+            || $(':focus').length == 0) {   
             window.parent.postMessage("lost focus", "*");
             //routes to content script for page access, 
             //then to background to respond to this frame
@@ -74,8 +75,8 @@ function blurHandler(){
 document.addEventListener('DOMContentLoaded', function() {
     setTabIndex();
     setUpNavigation();
-    setFirstSectionFocus();
     $('#interaction-controls').children().first().hide();
+    setFirstSectionFocus();
     
     $('*').blur(blurHandler);
 

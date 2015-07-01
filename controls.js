@@ -53,16 +53,13 @@ function injectKeyboard(){
     }    
     keyboard.style.cssText = style_txt;    
     document.documentElement.appendChild(keyboard); 
-    
-    $(text_selector).focus(openKeyboard);
 }
 
-function injectMyStyles(){
-    addStyle('.active-text-field', '{border: solid orange 3px !important;}');
-    
+function injectMyStyles(){    
     addStyle('.visible-section', '{border: solid purple 3px !important;}');
     addStyle('.active-section .conceptual-sub-section', '{border: solid mediumseagreen 3px;}'); 
     addStyle('.active-section', '{border: solid orchid 5px !important;}');
+    addStyle('.active-text-field', '{border: solid orange 3px !important;}');
 }
 
 function addStyle(selector, style_rules){ //strings
@@ -84,29 +81,21 @@ function openKeyboard(){
     var inputs = $(text_selector);
     var active_field = $('.active-text-field');
 
-    if (event.currentTarget == window){ //"Open Keyboard" button
-        if (active_field.length == 0){ //no active field
-            var txt_index = 0;
-            while (!( $(inputs[txt_index]).is(':visible'))){
-                txt_index++;
-//                if (txt_index==inputs.length){txt_index=0;}
-            }
-            $(inputs[txt_index]).addClass('active-text-field');
-
-        } //else stay at last active field
-    } else { //focus on text field
-        active_field.removeClass('active-text-field');
-        $(event.currentTarget).addClass('active-text-field');
-    }
+    if (active_field.length == 0){ //no active field
+        var txt_index = 0;
+        while (!( $(inputs[txt_index]).is(':visible'))){
+            txt_index++;
+        }
+        $(inputs[txt_index]).addClass('active-text-field');
+    } 
         
     //display the keyboard
     if ($("#keyboard-frame")[0].style.display == 'none'){
         $("#keyboard-frame").show();
-       var height = $("#keyboard-frame").height();
+        var height = $("#keyboard-frame").height();
         $("#keyboard-space-padding").height(height);
-        
-        chrome.runtime.sendMessage("keyboard focus");
     }
+        chrome.runtime.sendMessage("keyboard focus");
     
     scrollToView($('.active-text-field'));
 }
@@ -230,7 +219,9 @@ function selectSection(){
         if (current_section.is('link,button')){
             current_section[0].click();
         } else if (current_section.is(text_selector)){ 
-            current_section.focus();
+            $('.active-text-field').removeClass('active-text-field');
+            current_section.addClass('active-text-field');
+            openKeyboard();
         } else { //if non-text input
             current_section[0].click();
         }
@@ -480,16 +471,12 @@ function getDistanceBetweenEls(el1, el2){
     return Math.sqrt(a*a+b*b);
 }
 
-function regainFocus(){
-    var focus = document.activeElement;
-        
-    if  ($(focus).is(text_selector)
-        || $('#keyboard-frame')[0].style.display != 'none'){
+function regainFocus(){        
+    if  ($('#keyboard-frame')[0].style.display != 'none'){
         chrome.runtime.sendMessage("keyboard focus");         
     } else {
         chrome.runtime.sendMessage("panel focus"); 
     } 
-    //} else if (typeof focus == 'undefined'){ //in an iframe?
 }
 
 chrome.runtime.onMessage.addListener( //from the background page
@@ -548,32 +535,29 @@ Autoscan system:
 User guidance:
 - refresh page for settings to take effect (can I fix this with an onChanged listener?)
 - sometimes subsections will be outside the super-section
-- sometimes sections are invisible, just scan past them
+- sometimes the active section is invisible, just scan past it
 - if new content appears on the page, re-section to include
+    -clear section + re-section if needed
+-email sites often don't work
 
 Bugs/Issues:
-- can't cancel out of the Change Url popup at the moment
 - querying the active tab only works if 1 window open
-- email sites often don't work
-- on Google homepage, sometimes focus goes to panel behind keyboard
 
 Considerations:
     -section navigation: grey out non-active sections?
-    -including txt inputs in sectioning (and having the auto-open function) is unnecessary?
-        -removing this would make the text fields only accessible through the keyboard, making it harder to use other keyboards
     
 To do later:
     -replace focus-reliance with a class?
     -better autoscan (with delay in beginning of section, different times for sections vs single elements)
-    -detect http/https errors (maybe not important because google)
-    -improve sectioning heuristics?
+    -detect http/https errors
+        -less important with google and bookmarking
+    -improve sectioning heuristics
     -add bookmarking functions
     -other browser/window controls (window resizing/snapping/manipulation, volume controls)
     -connect the "search" function with link selection
     -allow user to create page-specific buttons for common actions
     -store keyboards as json objects and allow different layouts
     -clean/refactor/improve efficiency of code
-    -more options for auto-submit 
 
 https://object.io/site/2011/enter-git-flow/
 mousetrap (create keyboard shortcuts) 

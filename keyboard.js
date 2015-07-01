@@ -75,7 +75,7 @@ function processKeydown(e){
         next.focus();
 
     } else if (e.which == settings.select_code){
-         if (!(autoscan_on)){ 
+        if (settings.autoscan && !(autoscan_on)){ 
             startScan(); 
         } else {
     
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, processKeydown);
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-        if (message === 'keyboard focus'){
+        if (message == 'keyboard focus'){
             resetFocus(); 
         }  
     });
