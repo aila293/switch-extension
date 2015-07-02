@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 setFirstSectionFocus(); 
                 break;
             case "sectioning-on":
+                console.log(message);
                 $('#interaction-controls button').show();
                 $('#map-sections').text("Re-section the page");
                 $('#next-section').focus();
@@ -94,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
             case "sectioning-off":
                 $('#interaction-controls button').hide();
                 $('#map-sections').show();
-                $('#map-sections').text("Section the page");
+                $('#map-sections').text("Interact with the Page");
                 $('#interaction-controls').focus();
                 break;              
         }

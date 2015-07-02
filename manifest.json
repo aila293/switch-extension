@@ -1,8 +1,8 @@
     {
     "manifest_version": 2,
 
-    "name": "Switch Extension",
-    "description": "",
+    "name": "Chrome Switch Access",
+    "description": "Switch access for navigating web pages and browser controls",
     "version": "0.5",
 
     "background": {
@@ -20,19 +20,17 @@
 
     "content_scripts": [
         {
-        //"matches": ["*://*/*"], //any http or https, outdated?
-        "matches": ["<all_urls>"],
-            
+        "matches": ["<all_urls>"],            
         "js": ["jquery-1.11.3.min.js", "controls.js", "keyboard.js", "panel.js"]
         }
     ],
 
     "web_accessible_resources": [
-        "*.html" //specify own html pages (keyboard, panel) later
+        "*.html" //specify own html pages (keyboard, panel) later?
     ],
 
     "options_ui": {
         "page": "options.html",
-        "chrome_style": true //recommended by Chrome
+        "chrome_style": true 
     }
 }

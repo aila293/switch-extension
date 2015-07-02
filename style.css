@@ -1,0 +1,18 @@
+body {
+    background: skyblue;
+    font-size: 20px;
+    font-family: ;
+}
+header{
+    width: 60%;
+    min-width: 600px;
+    margin: auto;
+    font-size: 40px;
+}
+main {
+    width: 60%;
+    min-width: 600px;
+    margin:auto;
+    background: white;
+    padding: 5px 30px 10px 30px;
+}

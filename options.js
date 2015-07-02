@@ -68,7 +68,7 @@ function processKeydown(e){
     e.preventDefault();
     e.stopPropagation();
 
-    if (!(autoscan_on)){
+    if (settings.autoscan && !(autoscan_on)){ 
         startScan();
     } else {
         
@@ -132,6 +132,7 @@ function adjustScanRate(e, increment){
     var span = $('#scan_value');
     var val = parseFloat(span.text());
     val = (increment ? val+.5 : val-.5);
+    if (val <= 0){val = 0.5;}
     span.text(val);    
 }
 

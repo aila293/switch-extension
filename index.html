@@ -2,26 +2,86 @@
   
 <head>
     <title> Chrome Switch Access </title>
-    <style>
+    <link rel="stylesheet" type="text/css" href="style.css">
 
-    </style>
 </head>
   
 <body>
-    <h1> Chrome Switch Access </h1>
-    <p> Chrome Switch Access is a browser extension for Chrome that can be freely downloaded and used on any device with the Chrome browser. </p>
+    <header> Chrome Switch Access </header>
+    
+    <main>
+    <p> Chrome Switch Access is a browser extension for Chrome that allows switch access to web navigation and browser controls. It can be freely downloaded and used on any device with the Chrome browser. </p>
+        
+    <nav>
+        <a></a>
+        <a></a>
+        <a></a>
+    </nav>
     
     <h2> How to Install </h2>
     
-    <h2> How to Use the Extension </h2>
+    <p> At this stage, Chrome Switch Access is not yet available in the Chrome Web store. Until then you can install the extension by downloading the source files and uploading them to the Chrome browser. </p>
     
-    <h2> Known Issues </h2>
+    <ol>
+        <li> Go to 
+            <a href="https://github.com/aila293/switch-extension"  target="_blank" > https://github.com/aila293/switch-extension</a> </li>
+        <li> Click the "Download ZIP" button at the bottom of the right sidebar. This will download the zipped folder "switch-extension-master". </li>
+        <li> Unzip the "switch-extension-master" folder. </li>
+        <li> Visit "chrome://extensions" in your Chrome browser. </li>
+        <li> Check the "Developer mode" checkbox in the top right, above the list of extensions. </li>
+        <li> Click the "Load unpacked extension..." button that just appeared near the top of the page. A file-selection popup will appear. </li>
+        <li> Select the unzipped "switch-extension-master" folder. If there are two folders called "switch-extension-master", one inside the other, select the inner "switch-extension-master" folder. </li>
+        <li> You should now see "Chrome Switch Access" in your list of extensions. Uncheck the "Developer mode" checkbox. </li>
+    </ol>
+        
+    <h2> How to Use It </h2>
+        
+        <h3> Settings </h3>
+            <ul>
+                <li><strong>Auto-Scan and Scan Rate:</strong> turn Auto-Scan on for one-switch scanning. The scan rate is the number of seconds that each option will be highlighted, adjustable in half-second increments. </li>
+                <li><strong>Switch Interface Inputs:</strong> tell the extension which keyboard keys your switch interface is linked to. Selecting the "Set" button will open a small popup window. Activate the  switch (or type the appropriate keyboard key) at any time to send the input to the popup window.</li>
+                <li> <strong>"New Tab" Page:</strong> sets the page that new tabs will be opened on (when using the "New Tab" button in the control panel, not the browser). Chrome's default "New Tab" page is not recommended because the abilities of the extension are restricted on that page. </li>
+            </ul>
+            <p> For pages that were open before a settings change, refresh the page for the new settings to take effect. </p>
+        
+        <h3> Control Panel </h3>
+        
+            <h4> Page Interaction </h4>
+            <h4> Keyboard </h4>
     
-    <h2> Feedback </h2>
+    <h2> Known Issues and Workarounds </h2>
+        <p> Because of the way different websites are set up, the extension might behave unexpectedly on certain sites. Features related to sectioning and interacting with the page are especially affected. </p>
+        <ul>
+            <li> Much of the extension does not  work if more than one Chrome window is open.
+</li>
+            <li> Sometimes sub-sections (green) will be outside the borders of the section (purple) they belong to. </li>
+            <li> Sometimes the active section (pink) is marking a part of the page that isn't visible. Try hitting "Next Section" to move past the invisible section.</li>
+            <li> If new content appears on the page and isn't part of any section, hit "Re-section" to include it. </li>
+            <li> If sectioning the page fails for any other reason, hit "Clear Sections" and "Interact with the Page" again. Also try reloading the page. If that doesn't help, it may be that the layout of that particular page isn't compatible with the extension's sectioning process. </li>
+        </ul>
+
     
+    <h2> Contact Us </h2>
+    Email me at liuk@cs.unc.edu with any questions or feedback. We'd love to hear any opinions, suggestions regarding organization of the controls or changes to how features should work, or problems you encountered using the extension. If you report a problem, please be as specific as possible and include the page you were on, whether or not auto-scan was on, the sequence of buttons hit leading up to the problem, etc.
+    
+        </main>
     
 </body>
 
 </html>
+
+
+<!--
+
+Autoscan system: 
+ - hit switch once to start
+ - selecting section resets interval
+ - selecting a button ends scan
+ - hit switch again to start
+
+User guidance:
+-email sites often don't work
+
+-->
 
 

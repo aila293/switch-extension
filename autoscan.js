@@ -76,7 +76,6 @@ function toggleFocusStyle(){
         $(document.querySelector("#focus-style")).remove();
         $('#focus-style').remove();
     }
-
 }
 
 function showFocusStyle(){

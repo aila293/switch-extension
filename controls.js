@@ -523,25 +523,18 @@ window.addEventListener("message", function(event){
 
 /*  
 
-To do now: 
-    -make explanatory webpage/demo
-
-Autoscan system: 
- - hit switch once to start
- - selecting section resets interval
- - selecting a button ends scan
- - hit switch again to start
-
-User guidance:
-- refresh page for settings to take effect (can I fix this with an onChanged listener?)
-- sometimes subsections will be outside the super-section
-- sometimes the active section is invisible, just scan past it
-- if new content appears on the page, re-section to include
-    -clear section + re-section if needed
--email sites often don't work
-
-Bugs/Issues:
-- querying the active tab only works if 1 window open
+To do:
+    - access iframes
+    - correct active tab querying with >1 window
+    - override bookmarks page
+    - count links in a sub-section, manually break if too many? 
+    - detect http/https errors and other valid/nonvalid urls
+        -less important wiht Google and bookmarking?
+    - allow creation of page-specific buttons?
+    - refactor/clarify/document code
+    - avoid refresh for settings with an onChanged listener?
+    - have popups center on screen
+    - can't deal with pages that open their own popups
 
 Considerations:
     -section navigation: grey out non-active sections?
@@ -549,18 +542,13 @@ Considerations:
 To do later:
     -replace focus-reliance with a class?
     -better autoscan (with delay in beginning of section, different times for sections vs single elements)
-    -detect http/https errors
-        -less important with google and bookmarking
-    -improve sectioning heuristics
-    -add bookmarking functions
     -other browser/window controls (window resizing/snapping/manipulation, volume controls)
     -connect the "search" function with link selection
-    -allow user to create page-specific buttons for common actions
     -store keyboards as json objects and allow different layouts
-    -clean/refactor/improve efficiency of code
 
 https://object.io/site/2011/enter-git-flow/
 mousetrap (create keyboard shortcuts) 
 -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+cygwin
 
 */
