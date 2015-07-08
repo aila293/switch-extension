@@ -9,11 +9,10 @@ function injectPanel(){
     
     var style = [
         "z-index: 100;", 
-        "background-color: rgba(255,255,255, 0.4);",
+        "background-color: rgb(255,255,255);",
         "position: fixed;",
         "width: 99%;",
         "height: 70px;",
-       // "height: auto;", //about twice too big
         "bottom: 0px;",
         "border: solid black 3px;"
     ];
@@ -26,8 +25,8 @@ function injectPanel(){
     
     var padding = document.createElement("div"); 
     padding.id="keyboard-space-padding";
-    $(padding).height(panel.style.height);
-    $('body').append(padding);
+    padding.style.height = panel.style.height;
+    document.body.appendChild(padding);
 }
 
 function injectKeyboard(){ 
@@ -42,7 +41,7 @@ function injectKeyboard(){
         "z-index: 100;", 
         "position: fixed;",
         "bottom: 1px;",
-        "background-color: rgba(255,255,255, 0.9);",
+        "background-color: rgb(255,255,255);",
         "border: solid black 3px;",
         "margin: auto;"
     ];
@@ -90,10 +89,10 @@ function openKeyboard(){
     } 
         
     //display the keyboard
-    if ($("#keyboard-frame")[0].style.display == 'none'){
-        $("#keyboard-frame").show();
-        var height = $("#keyboard-frame").height();
-        $("#keyboard-space-padding").height(height);
+    var keyboard = $("#keyboard-frame");
+    if (keyboard[0].style.display == 'none'){
+        keyboard.show();
+        $("#keyboard-space-padding").height(keyboard.height());
     }
         chrome.runtime.sendMessage("keyboard focus");
     
@@ -398,7 +397,7 @@ function mapDOM(){
     
 }
 
-function unmapDOM(){ //remove classes or just remove the styling?
+function unmapDOM(){ 
     $('.conceptual-section').removeClass('conceptual-section');
     $('.conceptual-sub-section').removeClass('conceptual-sub-section');
     $('.active-section').removeClass('active-section');
@@ -423,8 +422,8 @@ function tabLinks(section){ //makes each link in the jquery object a sub-section
 function scrollWindow(direction){
     var scroll = $(document).scrollTop();
     switch(direction){
-        case 'up': scroll -= window.innerHeight*0.8; break;
-        case 'down': scroll += window.innerHeight*0.8; break;
+        case 'up': scroll -= (window.innerHeight-$('#panel-frame').height())*0.8; break;
+        case 'down': scroll += (window.innerHeight-$('#panel-frame').height())*0.8; break;
         case 'top': scroll = 0; break;
         case 'bottom': scroll = document.body.scrollHeight; break;                
     }
@@ -447,7 +446,6 @@ function isVisible(element){ //DOM element
             && (window.getComputedStyle(element)
                 .getPropertyValue('opacity') > 0)
             && ($(element).is(':visible'))
-            //deal with element being overlapped by another
         ; 
 }
 
@@ -524,17 +522,19 @@ window.addEventListener("message", function(event){
 /*  
 
 To do:
+    -fix red styling on keyboard
+    - auto-height too big, calculate height myself
     - access iframes
+    - reformat radio buttons/inputs in the wild to match my options page
     - correct active tab querying with >1 window
     - override bookmarks page
-    - count links in a sub-section, manually break if too many? 
+    - count links in a sub-section, manually group if too many 
     - detect http/https errors and other valid/nonvalid urls
-        -less important wiht Google and bookmarking?
-    - allow creation of page-specific buttons?
+        -less important with Google and bookmarking?
+    - allow creation of page-specific buttons
     - refactor/clarify/document code
-    - avoid refresh for settings with an onChanged listener?
-    - have popups center on screen
-    - can't deal with pages that open their own popups
+    - have my popups center on screen
+    -  deal with pages that open their own popups
 
 Considerations:
     -section navigation: grey out non-active sections?

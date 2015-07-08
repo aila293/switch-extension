@@ -141,9 +141,20 @@ function setupPage(){
     setupNavigation();
     
     $('#save').click(saveOptions);
-    $('#exit').click(function(){
+    $('#exit').click(function(e){
+        e.preventDefault();
         chrome.tabs.query({active: true}, function(tabs){
-            chrome.tabs.remove(tabs[0].id);
+            if (tabs[0].title == "Extensions"){ 
+                //adopted from popup.js getOptionsPage
+                 var pages = chrome.extension.getViews();
+                for (var i=0;i<pages.length;i++){
+                    if (pages[i] !== chrome.extension.getBackgroundPage()){ 
+                        pages[i].close(); 
+                    }
+                }
+            } else {
+                chrome.tabs.remove(tabs[0].id);   
+            }
         }); 
     });
     $('#increase').click(function(e){adjustScanRate(e,true);});

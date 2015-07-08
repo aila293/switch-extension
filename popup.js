@@ -121,12 +121,15 @@ function find(){
     exit.textContent='Exit Search';
     exit.id = 'exit';
     $(exit).insertBefore('#symbols');
+    
+    $('#submit').text("Search");
 
     $('section').first().focus();
 
     window.addEventListener("message", function(event){
         if (event.data == "submit"){
             background.postMessage(["find", $('input').val()], "*");
+            $('#submit').focus();
         } else if (event.data == 'exit'){
             closeWindow();
         } else {
@@ -138,27 +141,21 @@ function find(){
 function setKey(){
     document.body.textContent = "Enter switch input now";
     $('#keyboard').remove();
-
+    
     $(document).keydown(function(e){
         getOptionsPage().postMessage([purpose, e.which], "*");
-        closeWindow();
+        closeWindow(); 
     });
 }
 
-function getOptionsPage(){
-    //doesn't work from the chrome/extensions 'Options' link 
-    var pages = chrome.extension.getViews({type: 'tab'});
-    
-//                for (var i=0;i<pages.length;i++){
-//                    console.log(pages[i]);
-//                    if (pages[i] != background){ 
-//                        options_page = pages[i];
-//                        break;
-//                    }
-//                }
-    
-    var options_page = pages[0];
-    console.log(options_page);
+function getOptionsPage(){    
+    var pages = chrome.extension.getViews();
+        for (var i=0;i<pages.length;i++){
+            if (pages[i] !== background){ 
+                var options_page = pages[i]; //does this always work?
+                break;
+            }
+        }
     return options_page;
 }
 

@@ -41,15 +41,19 @@ function processButton(id){
             $('#letters_div').focus();                  
             break;
         case 'symbols':
-            if ($('#symbols_div').is(':visible')){
-                $('#symbols_div').hide();
-                this.innerText = "Show Numbers/Symbols";
+            var symbols = $('#symbols_div');
+            if (symbols.is(':visible')){
+                symbols.hide();
+                $('#'+id).text("Show Numbers/Symbols");
             } else {
-                $('#symbols_div').show();
-                this.innerText = "Hide Numbers/Symbols";
+                symbols.show();
+                 $('#'+id).text("Hide Numbers/Symbols");
             }
-            $('#symbols_div').focus();
+           symbols.focus();
             break;
+        case 'submit':
+            $('#submit').focus();
+            window.parent.postMessage(id, "*");   
         default:
             resetFocus();
             window.parent.postMessage(id, "*");   

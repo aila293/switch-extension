@@ -48,6 +48,33 @@ function changeTab(){
     });    
 }
 
+function openPopup(purpose){
+    switch (purpose){
+        case 'find':
+            chrome.windows.create({'url': 'popup.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
+            break;
+        case 'change-url':
+            chrome.windows.create({'url': 'popup.html?changeurl', 'width': 600, 'height': 400,'type': 'popup'}, function(window) {});
+            break;
+    }
+}
+
+function openTab(url){
+    switch(url){
+        case 'new-tab':
+            chrome.storage.sync.get({ 
+                newtab_url: "https://www.google.com", 
+            }, function(items) {
+                chrome.tabs.create({url: items.newtab_url}); 
+            });
+            break;
+        case 'settings':
+            var settings_url = "chrome-extension://"+ chrome.runtime.id + "/options.html";
+            chrome.tabs.create({url: settings_url});
+            break;
+    }
+}
+
 var browser_tabs;
 chrome.runtime.onMessage.addListener( //from the content script 
     function(message, sender, sendResponse) {
@@ -65,35 +92,18 @@ chrome.runtime.onMessage.addListener( //from the content script
             
             //use chrome.tabs
             case 'reload': chrome.tabs.reload(); break;
-            case 'new-tab': 
-                chrome.storage.sync.get({ 
-                    newtab_url: "https://www.google.com", 
-                }, function(items) {
-                    chrome.tabs.create({url: items.newtab_url}); 
-                });
-                break;
+            case 'new-tab': case 'settings': openTab(message); break;
             case 'copy-tab': getActiveTab(duplicate); break;
             case 'close-tab': getActiveTab(remove); break;
-            case 'close-other-tabs': getAllTabs(closeOther); break;
-            case 'change-url':
-                chrome.windows.create({'url': 'popup.html?changeurl', 
-                                       'width': 600, 'height': 400, 
-                                       'type': 'popup'}, function(window) {}); 
-                break;
+            case 'change-url': case 'find': openPopup(message); break;
             case 'change-tab': changeTab(); break;
             case 'zoom-in': case 'zoom-out': zoom(message); break;
-            case 'find':
-                chrome.windows.create({'url': 'popup.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
-                break;
-            case 'settings':
-                var settings_url = "chrome-extension://"+ chrome.runtime.id + "/options.html";
-                chrome.tabs.create({url: settings_url});
-                break;
       }
   });
 
-//information from the popup page, sent through controls.js
+//info from the popup page, sent through controls.js
 window.addEventListener("message", function(event){
+    
     //purpose as event.data[0], information as event.data[1]
     switch(event.data[0]){
         case 'change-tab':
@@ -102,7 +112,6 @@ window.addEventListener("message", function(event){
             break;
         case 'find':
             chrome.windows.getAll({populate:true}, function(windows){
-                //window.find(event.data[1])); //checks background.html
                 chrome.tabs.query({active: true}, function(tabs){
                     chrome.tabs.sendMessage(tabs[0].id, event.data[1]);
                 });
@@ -113,8 +122,10 @@ window.addEventListener("message", function(event){
             chrome.tabs.query({active: true}, function(tabs){
                 intended_url = event.data[1];
                 chrome.tabs.update(tabs[0].id, {url: intended_url}, function(tab){});
-         chrome.webRequest.onErrorOccurred.addListener(function(details){
-            console.log(details.error);
+                
+        //attempts to detect failure
+            chrome.webRequest.onErrorOccurred.addListener(function(details){
+//            console.log(details.error);
                 var url = details.url.substring(0, details.url.length-1);
                 if (url == intended_url){
                     url = url.replace("https://", "http://");
@@ -122,7 +133,7 @@ window.addEventListener("message", function(event){
                 }
             }, {urls: ["https://*/*"]});
                 
-        chrome.webNavigation.onErrorOccurred.addListener(function(details){
+            chrome.webNavigation.onErrorOccurred.addListener(function(details){
                 var url = details.url.substring(0, details.url.length-1);
     
                 if (url == intended_url){

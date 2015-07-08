@@ -86,7 +86,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 setFirstSectionFocus(); 
                 break;
             case "sectioning-on":
-                console.log(message);
                 $('#interaction-controls button').show();
                 $('#map-sections').text("Re-section the page");
                 $('#next-section').focus();

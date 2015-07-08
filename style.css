@@ -1,18 +1,59 @@
 body {
-    background: skyblue;
+    background: rgb(146,201,255);
     font-size: 20px;
-    font-family: ;
+    font-family: Arial, Helvetica, sans-serif;
 }
 header{
-    width: 60%;
+    width: 55%;
     min-width: 600px;
     margin: auto;
-    font-size: 40px;
+    text-align: center;
+    font-size: 50px;
+    font-family: Verdana, Geneva, sans-serif;
 }
-main {
-    width: 60%;
+main{
+    margin: 30px 0px 0px 30px;
+}
+section {
+    width: 55%;
     min-width: 600px;
-    margin:auto;
+    margin: 20px 22% 20px 23%;
     background: white;
-    padding: 5px 30px 10px 30px;
+    padding: 1px 30px 1px 30px;
+    border: solid black 2px;
 }
+h2{
+    text-align: center;
+}
+img{
+    width: 100%;
+    margin: 10px 0px 10px 0px;
+    border: solid black 1px;
+}
+figcaption{
+    font-size: 16px;
+    font-family: Verdana;
+}
+
+nav{
+    position: fixed;
+    top: 22%;
+    left: 6%;   
+    margin: 20px auto 20px auto;
+    background: white;
+    border: solid black 2px;
+}
+nav a{
+    display: block;
+    text-decoration: none;
+    padding: 5px 10px 5px 10px;
+    width: 100%;
+}
+nav ul{
+   margin: 0px; 
+}
+nav ul a {
+    position: relative;
+    left: -10px;
+}
+

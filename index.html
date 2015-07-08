@@ -7,81 +7,135 @@
 </head>
   
 <body>
+    
+<nav>
+    <a href="#top">Chrome Switch Access</a>
+    <a href='#install'> How to Install </a> 
+    <a> How to Use It </a>
+    <ul>
+        <a href='#settings'> - Settings </a>
+        <a href='#panel'> - Control Panel </a>
+        <a href='#interaction'> - Page Interaction</a>
+        <a href='#keyboard'>- Keyboard</a>
+        <a href='#keyboard'>- Other Controls</a>
+    </ul>
+    <a href='#issues'>Known Issues</a>
+    <a href='#contact'>Contact Us</a>
+</nav>
+    
+<main>
+    <section>
     <header> Chrome Switch Access </header>
-    
-    <main>
-    <p> Chrome Switch Access is a browser extension for Chrome that allows switch access to web navigation and browser controls. It can be freely downloaded and used on any device with the Chrome browser. </p>
-        
-    <nav>
-        <a></a>
-        <a></a>
-        <a></a>
-    </nav>
-    
-    <h2> How to Install </h2>
-    
-    <p> At this stage, Chrome Switch Access is not yet available in the Chrome Web store. Until then you can install the extension by downloading the source files and uploading them to the Chrome browser. </p>
-    
-    <ol>
-        <li> Go to 
-            <a href="https://github.com/aila293/switch-extension"  target="_blank" > https://github.com/aila293/switch-extension</a> </li>
-        <li> Click the "Download ZIP" button at the bottom of the right sidebar. This will download the zipped folder "switch-extension-master". </li>
-        <li> Unzip the "switch-extension-master" folder. </li>
-        <li> Visit "chrome://extensions" in your Chrome browser. </li>
-        <li> Check the "Developer mode" checkbox in the top right, above the list of extensions. </li>
-        <li> Click the "Load unpacked extension..." button that just appeared near the top of the page. A file-selection popup will appear. </li>
-        <li> Select the unzipped "switch-extension-master" folder. If there are two folders called "switch-extension-master", one inside the other, select the inner "switch-extension-master" folder. </li>
-        <li> You should now see "Chrome Switch Access" in your list of extensions. Uncheck the "Developer mode" checkbox. </li>
-    </ol>
-        
-    <h2> How to Use It </h2>
-        
-        <h3> Settings </h3>
-            <ul>
-                <li><strong>Auto-Scan and Scan Rate:</strong> turn Auto-Scan on for one-switch scanning. The scan rate is the number of seconds that each option will be highlighted, adjustable in half-second increments. </li>
-                <li><strong>Switch Interface Inputs:</strong> tell the extension which keyboard keys your switch interface is linked to. Selecting the "Set" button will open a small popup window. Activate the  switch (or type the appropriate keyboard key) at any time to send the input to the popup window.</li>
-                <li> <strong>"New Tab" Page:</strong> sets the page that new tabs will be opened on (when using the "New Tab" button in the control panel, not the browser). Chrome's default "New Tab" page is not recommended because the abilities of the extension are restricted on that page. </li>
-            </ul>
-            <p> For pages that were open before a settings change, refresh the page for the new settings to take effect. </p>
-        
-        <h3> Control Panel </h3>
-        
-            <h4> Page Interaction </h4>
-            <h4> Keyboard </h4>
-    
-    <h2> Known Issues and Workarounds </h2>
-        <p> Because of the way different websites are set up, the extension might behave unexpectedly on certain sites. Features related to sectioning and interacting with the page are especially affected. </p>
-        <ul>
-            <li> Much of the extension does not  work if more than one Chrome window is open.
-</li>
-            <li> Sometimes sub-sections (green) will be outside the borders of the section (purple) they belong to. </li>
-            <li> Sometimes the active section (pink) is marking a part of the page that isn't visible. Try hitting "Next Section" to move past the invisible section.</li>
-            <li> If new content appears on the page and isn't part of any section, hit "Re-section" to include it. </li>
-            <li> If sectioning the page fails for any other reason, hit "Clear Sections" and "Interact with the Page" again. Also try reloading the page. If that doesn't help, it may be that the layout of that particular page isn't compatible with the extension's sectioning process. </li>
-        </ul>
 
+    <p> Chrome Switch Access is a browser extension that enables web navigation by adding a switch-accessible "control panel" to each page. These controls provide abilities like scrolling the page, selecting links and buttons, creating and closing tabs, and typing into the page with a virtual keyboard. Most importantly, Chrome Switch Access is free to download and can be used on any device with the Chrome browser. </p>
+        <p>Right now the project is in beta testing before being submitted to the Chrome web store.  If you'd like to help, follow the steps below to install the extension and send us your feedback. </p>
+    </section>
+        
+    <section id='install'>
+        <h2> How to Install </h2>
+
+        <p> Instead of using the Chrome web store, you can install the extension by downloading the source files and uploading them to the Chrome browser. </p>
+
+        <ol>
+            <li> Go to 
+                <a href="https://github.com/aila293/switch-extension"  target="_blank" > https://github.com/aila293/switch-extension</a> </li>
+            <li> Click the "Download ZIP" button at the bottom of the right sidebar. This will download the zipped folder "switch-extension-master". </li>
+            <li> Unzip the "switch-extension-master" folder. </li>
+            <li> Visit "chrome://extensions" in your Chrome browser. </li>
+            <li> Check the "Developer mode" checkbox in the top right, above the list of extensions. </li>
+            <li> Click the "Load unpacked extension..." button that appears near the top of the page. A file-selection popup will appear. </li>
+            <li> Select the unzipped "switch-extension-master" folder. If there are two folders called "switch-extension-master", one inside the other, select the inner "switch-extension-master" folder. </li>
+            <li> You should now see "Chrome Switch Access" in your list of extensions. Uncheck the "Developer mode" checkbox. Stay on "chrome://extensions to configure the settings.</li>
+        </ol>
+     </section>
+        
+    <section id='settings'>
+        <h2> How to Use It </h2>
+        <h3> Settings </h3>
+        On chrome://extensions, click the "Options" link (between "Details" and "Reload(Ctrl+R)") under Chrome Switch Access. A popup with settings should appear. Later, the settings can be accessed through the "Extension Settings" control on the control panel.
+        <ul>
+                <li><strong>Auto-Scan and Scan Rate:</strong> turn Auto-Scan on for one-switch scanning. Activate the switch to start the autoscan, and select an item to stop the autoscan. The light blue border that marks the current item/group will turn red when the autoscan has started. The scan rate is the number of seconds that each option will be active, adjustable in half-second increments. </li>
+                <li><strong>Switch Interface Inputs:</strong> tell the extension which keyboard keys your switch interface is set to. Selecting the "Set" button will open a small popup window. Activate the switch (or type the appropriate keyboard key) at any time to send the input. </li>
+                <li> <strong>"New Tab" Page:</strong> sets the page that new tabs will be opened on (when using the "New Tab" control in the control panel, not the browser). Chrome's default "New Tab" page is not recommended because the abilities of extensions are restricted on that page. </li>
+            </ul>
+        <p> You may have to refresh the page for new settings to take effect. </p>
+    </section>
+        
+    <section id='panel'>
+        <h3> Control Panel </h3>
+        <p> The control panel has 5 groups: scrolling, page interaction, tab controls, keyboard and settings, and other page/window controls. The panel opens in "group mode", with the first group (scrolling) active.
+        <img src='images/groupmode.png'>
+        In group mode, the extension will scan through each group in order, with the currently active group highlighted in red. Selecting a group will activate the first control in that group, changing to "item mode". In item mode, the panel will scan through the controls in one group. After the last control in a group (e.g. "Scroll to Top"), it'll return to group mode and activate the group it's in (e.g. scrolling).
+        <img src='images/itemmode.png'>
+ After selecting any control, the panel will stay in item mode, activating the first control in the same group as the selected one.
+        </p>
+    </section>
+        
+    <section id='interaction'>
+        <h3> Page Interaction </h3>
+        <p>The page interaction controls allow for clicking links, buttons, and input fields in the page by navigating a hierarchy of levels. First, select the "Interact with the Page" control to open a new set of controls.
+            <img src='images/sectioncontrols.png'>
+            "Interact with the Page" will also divide the page into different sections, each bordered with purple. The purple sections together are the active level. The active <em>section</em> in the level will be bordered with pink, and a preview of the active section's sub-sections will each be bordered in green.
+        <figure>
+            <img src='images/sectioning.png'>
+            <figcaption> Sections in the active level: the Google logo (top left), the search bar (top middle), user profile buttons (top right), search tools menu (below search bar), search results (middle). Active section: search results. Sub-sections: each search result. </figcaption>
+        </figure>
+                Using the "Next Section" and "Previous Section" controls to scan through the sections in the active level, navigate to the section that includes the link/button/input you want. Hit the "Select Section" control to select that section and go down a level, making that section's sub-sections (in green) the new active level. Eventually the active section will be a single link/button/input. Hitting "Select Section" will click it. (Or, if it's a text input field, open the extension's keyboard.)        
+        </p>
+        <ul>
+            <li><strong>Go Up a Level:</strong> undo a "Select Section"</li>
+            <li><strong>Re-section the page:</strong> redraw the sections to include new content that's appeared on the page</li>          
+            <li><strong>Clear Sections:</strong> remove all the section lines and close this set of controls</li>
+        </ul>
+    </section>
+        
+    <section id='keyboard'>
+        <h3> Keyboard </h3>
+        <p>The extension's virtual keyboard opens after selecting a text field or using the "Open Keyboard" control in the control panel. 
+            <img src='images/keyboard.png'>
+            The scanning order is similar to the control panel's, with three main groups (letters, other characters, and keyboard controls) and sub-groups of 5 letters or characters. Selecting a key will type it to the active text field (highlighted in orange). If the keyboard is opened from the "Open Keyboard" control, the first text field on the page becomes the active text field.</p>
+        <ul> 
+            <li><strong>Submit text:</strong> automatically submits the text field to the site</li>
+            <li><strong>Next text field:</strong> marks the next text field on the page as the active text field</li>
+            <li><strong>Capital Letters: </strong>shifts the letters to uppercase</li>
+            <li><strong>Show Numbers/Symbols: </strong> opens a set of keys that includes numbers and other symbols</li>
+            <li><strong>Clear this field:</strong> deletes the text in the active text field</li>
+            <li><strong>Close Keyboard:</strong> closes the keyboard and returns to the control panel. Does not change the active text field or remove any text in it</li>
+        </ul>
+    </section>
+        
+    <section id='other'>
+        <h3>Other Controls</h3>
+        <ul> 
+            <li><strong>Change Tab:</strong> opens a popup showing all the open tabs in the window. Select a tab to switch to it. </li>
+            <li><strong>Navigate to URL:</strong>  opens a popup for entering text. Type in a full URL and hit "Submit" to navigate to that page. This feature is currently not very reliable. </li>
+            <li><strong>Back/Forward a Page: </strong> navigates one page backward or forward in the window's history</li>
+            <li><strong>Search the Page:</strong> opens a popup for entering text. Hitting "Search" will highlight the next instance of that text in the page. Hit "Exit Search" to close the popup. </li> 
+        </ul>
+    </section>
     
-    <h2> Contact Us </h2>
-    Email me at liuk@cs.unc.edu with any questions or feedback. We'd love to hear any opinions, suggestions regarding organization of the controls or changes to how features should work, or problems you encountered using the extension. If you report a problem, please be as specific as possible and include the page you were on, whether or not auto-scan was on, the sequence of buttons hit leading up to the problem, etc.
+    <section id='issues'>
+        <h2> Known Issues </h2>
+        <ul>
+
+            <li>The page-interaction controls depends on the structure of the website you're on, so they might behave unexpectedly on certain sites. </li>
+            <ul>
+                <li> Sub-sections (green) might be outside the borders of the section (purple/pink) they belong to. </li>
+                <li> The active section (pink) might be a part of the page that isn't visible. Hit "Next Section" to move past it.</li>
+                <li> The section might be visible, but the colored border might be invisible or incomplete. </li>
+                <li>Email sites usually don't section correctly.</li>
+            </ul>
+            <li> Much of the extension will not work if more than one Chrome window is open.</li>
+            <li> It does not work with popups. </li>
+        </ul>
+    </section>
     
-        </main>
-    
+    <section id='contact'>
+        <h2> Contact Us </h2>
+        <p>Email me at liuk@cs.unc.edu with any questions or feedback. Suggestions about the extension's organization, appearance, features, or problems you encountered while using it are all appreciated. If you report a problem, please be as specific as possible with the sequence of events and what you saw. </p>
+    </section>
+        
+</main>
 </body>
 
 </html>
-
-
-<!--
-
-Autoscan system: 
- - hit switch once to start
- - selecting section resets interval
- - selecting a button ends scan
- - hit switch again to start
-
-User guidance:
--email sites often don't work
-
--->
-
-
