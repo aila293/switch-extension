@@ -1,4 +1,25 @@
 
+
+//removes all tabs except active one
+//getAllTabs(closeOther);
+function getAllTabs(callback){
+    chrome.windows.getLastFocused({populate: true}, function(window){
+        var all_tabs = window.tabs;
+        for (var i=0;i<all_tabs.length;i++){
+            all_tabs[i] = all_tabs[i].id;
+        }
+        callback(all_tabs);
+    });
+}
+function closeOther(all_tabs){
+    chrome.tabs.query({active: true}, function(tabs){
+        var i = all_tabs.indexOf(tabs[0].id);
+        all_tabs.splice(i,1);
+        chrome.tabs.remove(all_tabs);
+    });
+}
+
+
 //in popup, submits if either key is hit. 
     $(document).keydown(function(e){
         chrome.storage.sync.get({

@@ -3,25 +3,7 @@ function getActiveTab(callback){
         callback(tabs[0].id);
     });
 }
-function duplicate(tab){chrome.tabs.duplicate(tab);}
 function remove(tab){chrome.tabs.remove(tab);}
-
-function getAllTabs(callback){
-    chrome.windows.getLastFocused({populate: true}, function(window){
-        var all_tabs = window.tabs;
-        for (var i=0;i<all_tabs.length;i++){
-            all_tabs[i] = all_tabs[i].id;
-        }
-        callback(all_tabs);
-    });
-}
-function closeOther(all_tabs){
-    chrome.tabs.query({active: true}, function(tabs){
-        var i = all_tabs.indexOf(tabs[0].id);
-        all_tabs.splice(i,1);
-        chrome.tabs.remove(all_tabs);
-    });
-}
 
 var zoom_levels = [0, 0.25, 0.33, 0.5, 0.67, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5];
 function zoom(direction){
@@ -119,7 +101,6 @@ window.addEventListener("message", function(event){
         case 'change-url':
             var intended_url;
             chrome.tabs.query({active: true}, function(tabs){
-
                 intended_url = event.data[1];
                 chrome.tabs.update(tabs[0].id, {url: intended_url}, function(tab){});
                 
@@ -143,7 +124,7 @@ window.addEventListener("message", function(event){
                 }
             });
                 
-                }); //end of chrome.tabs.query
+            }); //end of chrome.tabs.query
             break;            
       }
 });

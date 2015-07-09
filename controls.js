@@ -55,10 +55,10 @@ function injectKeyboard(){
 }
 
 function injectMyStyles(){    
-    addStyle('.visible-section', '{border: solid purple 3px !important;}');
-    addStyle('.active-section .conceptual-sub-section', '{border: solid mediumseagreen 3px;}'); 
-    addStyle('.active-section', '{border: solid orchid 5px !important;}');
-    addStyle('.active-text-field', '{border: solid orange 3px !important;}');
+    addStyle('.visible-section', '{outline: solid purple 3px !important;}');
+    addStyle('.active-section .conceptual-sub-section', '{outline: solid mediumseagreen 3px;}'); 
+    addStyle('.active-section', '{outline: solid orchid 5px !important;}');
+    addStyle('.active-text-field', '{outline: solid orange 3px !important;}');
 }
 
 function addStyle(selector, style_rules){ //strings
@@ -522,19 +522,18 @@ window.addEventListener("message", function(event){
 /*  
 
 To do:
-    - remove default focus border on keys
     - auto-height too big, calculate height myself
     - access iframes
     - reformat radio buttons/inputs in the wild to match my options page
-    - correct active tab querying with >1 window
     - override bookmarks page
     - count links in a sub-section, manually group if too many 
     - detect http/https errors and other valid/nonvalid urls
         -less important with Google and bookmarking?
     - allow creation of page-specific buttons
     - refactor/clarify/document code
-    - have my popups center on screen
     -  deal with pages that open their own popups
+    - correct active tab querying with >1 window
+    - have my popups center on screen
 
 Considerations:
     -section navigation: grey out non-active sections?
