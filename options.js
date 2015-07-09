@@ -143,7 +143,7 @@ function setupPage(){
     $('#save').click(saveOptions);
     $('#exit').click(function(e){
         e.preventDefault();
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+        chrome.tabs.query({active: true}, function(tabs){
             if (tabs[0].title == "Extensions"){ 
                 //adopted from popup.js getOptionsPage
                  var pages = chrome.extension.getViews();

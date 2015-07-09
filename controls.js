@@ -522,7 +522,7 @@ window.addEventListener("message", function(event){
 /*  
 
 To do:
-    -fix red styling on keyboard
+    - remove default focus border on keys
     - auto-height too big, calculate height myself
     - access iframes
     - reformat radio buttons/inputs in the wild to match my options page
