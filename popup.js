@@ -53,16 +53,26 @@ function changeTabHandler(e){
         }
         next.focus();
     } else if (e.which == settings.select_code){
-        background.postMessage(["change-tab", e.target.id], "*");
-        closeWindow();                     
+        if (settings.autoscan && !(autoscan_on)){ 
+            startScan(); 
+        } else {
+            background.postMessage(["change-tab", e.target.id], "*");
+            closeWindow();  
+        }
     }  
 }
 
+function insertKeyboardScript(){
+    var script = document.createElement('script');
+    script.src="keyboard.js";
+    document.head.appendChild(script);
+}
 
 //purpose functions
 
 function changeUrl(){
     document.title = "Enter new URL";
+    insertKeyboardScript();
 
     var input = document.createElement('input');
     input.value = "https://www."; 
@@ -98,20 +108,20 @@ function changeTab(){
     document.title = "Select Tab";
     populateTabs();
     $('#keyboard').remove();
-    $('button').first().focus();
 
+    $('button').first().focus();
 
     initiateAutoscan(function(){
         $('button').keydown(function(e){
             changeTabHandler(e);
         });
-        startScan();
     }, changeTabHandler);
 }
 
 function find(){
     document.title = "Enter text";
-
+    insertKeyboardScript();
+    
     var input = document.createElement('input');
     $(input).insertBefore('#keyboard');
 
