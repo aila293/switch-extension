@@ -62,17 +62,10 @@ function changeTabHandler(e){
     }  
 }
 
-function insertKeyboardScript(){
-    var script = document.createElement('script');
-    script.src="keyboard.js";
-    document.head.appendChild(script);
-}
-
 //purpose functions
 
 function changeUrl(){
     document.title = "Enter new URL";
-    insertKeyboardScript();
 
     var input = document.createElement('input');
     input.value = "https://www."; 
@@ -107,7 +100,6 @@ function changeUrl(){
 function changeTab(){
     document.title = "Select Tab";
     populateTabs();
-    $('#keyboard').remove();
 
     $('button').first().focus();
 
@@ -120,7 +112,6 @@ function changeTab(){
 
 function find(){
     document.title = "Enter text";
-    insertKeyboardScript();
     
     var input = document.createElement('input');
     $(input).insertBefore('#keyboard');
@@ -150,7 +141,6 @@ function find(){
 
 function setKey(){
     document.body.textContent = "Enter switch input now";
-    $('#keyboard').remove();
     
     $(document).keydown(function(e){
         getOptionsPage().postMessage([purpose, e.which], "*");
@@ -175,13 +165,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     chrome.tabs.query({windowType: "popup"}, function(tabs){
         var url = tabs[0].url;
-        var pos = url.indexOf("popup.html");
-        purpose = url.substring(pos + 11);
+        var pos = url.indexOf("?");
+        purpose = url.substring(pos + 1);
     
         switch(purpose){
             case 'changeurl': case 'newtaburl': changeUrl(); break;
-            case 'changetab': changeTab(); break;
             case 'find': find(); break;
+
+            case 'changetab': changeTab(); break;
             case 'scankey': case 'selectkey': setKey(); break;
         }
     });

@@ -51,10 +51,10 @@ function changeTab(){
 function openPopup(purpose){
     switch (purpose){
         case 'find':
-            chrome.windows.create({'url': 'popup.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
+            chrome.windows.create({'url': 'popup-keyboard.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
             break;
         case 'change-url':
-            chrome.windows.create({'url': 'popup.html?changeurl', 'width': 600, 'height': 400,'type': 'popup'}, function(window) {});
+            chrome.windows.create({'url': 'popup-keyboard.html?changeurl', 'width': 600, 'height': 400,'type': 'popup'}, function(window) {});
             break;
     }
 }
@@ -93,7 +93,6 @@ chrome.runtime.onMessage.addListener( //from the content script
             //use chrome.tabs
             case 'reload': chrome.tabs.reload(); break;
             case 'new-tab': case 'settings': openTab(message); break;
-            case 'copy-tab': getActiveTab(duplicate); break;
             case 'close-tab': getActiveTab(remove); break;
             case 'change-url': case 'find': openPopup(message); break;
             case 'change-tab': changeTab(); break;
@@ -120,6 +119,7 @@ window.addEventListener("message", function(event){
         case 'change-url':
             var intended_url;
             chrome.tabs.query({active: true}, function(tabs){
+
                 intended_url = event.data[1];
                 chrome.tabs.update(tabs[0].id, {url: intended_url}, function(tab){});
                 

@@ -108,7 +108,7 @@ function processKeydown(e){
             stopScan();
             e.target.click();
             if (e.target.name=='custom-url'){
-                chrome.windows.create({'url': 'popup.html?newtaburl', 'width': 600, 'height': 400, 'type': 'popup'}, function(window) {}); 
+                chrome.windows.create({'url': 'popup-keyboard.html?newtaburl', 'width': 600, 'height': 400, 'type': 'popup'}, function(window) {}); 
             }
         }
     }
@@ -143,7 +143,7 @@ function setupPage(){
     $('#save').click(saveOptions);
     $('#exit').click(function(e){
         e.preventDefault();
-        chrome.tabs.query({active: true}, function(tabs){
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
             if (tabs[0].title == "Extensions"){ 
                 //adopted from popup.js getOptionsPage
                  var pages = chrome.extension.getViews();
