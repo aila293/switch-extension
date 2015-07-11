@@ -125,6 +125,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         if (message == 'keyboard focus'){
+        
+        //adjust height
+    window.parent.postMessage(["keyboard-height", $(document).height()], "*")
             resetFocus(); 
         }  
     });

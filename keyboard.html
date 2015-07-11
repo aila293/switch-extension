@@ -24,12 +24,14 @@
         
         section{
             display: inline-block;
-            padding-right: 15px;
+            margin-right: 15px;
         }
         #symbols_div{
             display: none;
         }
-        
+        .last{
+            margin-right: 0px;
+        }
     </style>
     
     <script src="autoscan.js"></script>  
@@ -45,13 +47,13 @@
         <section id="letters2" tabindex='10'></section>
         <section id="letters3" tabindex='20'></section>
         <section id="letters4" tabindex='30'></section>
-        <section id="letters5" tabindex='40'></section>
+        <section id="letters5" tabindex='40' class="last"></section>
     </div>
 
     <div tabindex='49'>
         <section id="punctuation1" tabindex='50'> </section> 
         <section id="punctuation2" tabindex='60'> </section> 
-        <section id="punctuation3" tabindex='70'> </section> 
+        <section id="punctuation3" tabindex='70' class="last"> </section> 
     </div>
 
     <div tabindex='100' id='symbols_div'>
@@ -59,7 +61,7 @@
         <section id="symbols2" tabindex='110'></section>
         <section id="symbols3" tabindex='120'></section>
         <section id="symbols4" tabindex='130'></section>
-        <section id="symbols5" tabindex='140'></section>
+        <section id="symbols5" tabindex='140' class="last"></section>
     </div>
     
     <div tabindex='150'>

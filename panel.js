@@ -73,6 +73,9 @@ function blurHandler(){
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    //make panel-frame resize
+    window.parent.postMessage(["panel-height", $(document).height()], "*"); 
+    
     setTabIndex();
     setUpNavigation();
     $('#interaction-controls').children().first().hide();

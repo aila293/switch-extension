@@ -286,7 +286,51 @@ function mapSection(section){  //marks sub-sections
             inner_links.addClass('conceptual-sub-section');
         }
     });
-    //artificially break long (many links) sections (e.g. W3schools)
+    
+    var list_types = {TR: 0, A: 0, LI: 0};
+    var start_of_list = {TR: 0, A: 0, LI: 0};
+    var streak;
+    sub_sections = $('.conceptual-sub-section');
+    
+    sub_sections.each(function(index){
+        var tag = this.tagName;
+            
+        if (typeof streak == 'undefined'){ //start tracking
+            list_types[tag]++;            
+            start_of_list[tag] = index;  
+            streak = tag;
+        } else {
+            if (streak == tag){ //continue streak
+                list_types[tag]++;
+            } else if (list_types[streak] < 6){
+                list_types[streak] = 0;
+            }
+        }
+    });
+    
+    $.each(list_types, function(type,count){
+        if (count>5){
+            var filtered = sub_sections.filter(function(index){
+                var start = start_of_list[type];
+                return (index >= start
+                   && index < start+count);
+            });
+
+            if (count<10) {step = (count+1)/2;} 
+            else if (count>=30) {step = count/5;} 
+            else {step=5;}
+
+            var first = 0;
+            while (first < filtered.length){
+                filtered.filter(function(index){
+                    return (index >= first
+                   && index < first+step);
+                }).removeClass('conceptual-sub-section').wrapAll("<div class='conceptual-sub-section'></div>");
+                first +=step;
+            }
+        }
+    });
+    
 }
 
 function unmapSection(section){
@@ -387,8 +431,6 @@ function mapDOM(){
         }
     }
         
-    //group sections by location if $(".conceptual-section).length is too high
-    
     if ($('.visible-section').length==0){
         $('.conceptual-section').addClass('visible-section');  
         moveSection(true);
@@ -490,6 +532,12 @@ window.addEventListener("message", function(event){
     my_origin = my_origin.substring(0, my_origin.length-1); //remove slash at the end
     
     if (event.origin.indexOf(my_origin) != -1){ 
+        if (event.data[0] == "panel-height"){
+            $('#panel-frame').height(event.data[1]+5);
+        } else if (event.data[0] == "keyboard-height"){
+            $('#keyboard-frame').height(event.data[1]+5);
+        } else {
+            
         switch(event.data){
                 
             //from keyboard iframe
@@ -516,32 +564,29 @@ window.addEventListener("message", function(event){
             default: typeToInput(event.data);
         }
     }
+    }
 }, false);
 
 
 /*  
 
 To do:
-    - auto-height too big, calculate height myself
     - access iframes
     - reformat radio buttons/inputs in the wild to match my options page
     - override bookmarks page
-    - count links in a sub-section, manually group if too many 
+    - refactor/clarify/document code
+    - deal with pages that open their own popups
+    
+    - correct active tab querying with >1 window
     - detect http/https errors and other valid/nonvalid urls
         -less important with Google and bookmarking?
-    - allow creation of page-specific buttons
-    - refactor/clarify/document code
-    -  deal with pages that open their own popups
-    - correct active tab querying with >1 window
     - have my popups center on screen
-
-Considerations:
-    -section navigation: grey out non-active sections?
     
 To do later:
+    -creation of page-specific buttons
     -replace focus-reliance with a class?
     -better autoscan (with delay in beginning of section, different times for sections vs single elements)
-    -other browser/window controls (window resizing/snapping/manipulation, volume controls)
+    -other controls (window snapping, volume controls)
     -connect the "search" function with link selection
     -store keyboards as json objects and allow different layouts
 
