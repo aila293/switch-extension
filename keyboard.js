@@ -45,11 +45,14 @@ function processButton(id){
             if (symbols.is(':visible')){
                 symbols.hide();
                 $('#'+id).text("Show Numbers/Symbols");
+                adjustFrameHeight($(document).height()-50);
+                setTimeout(adjustFrameHeight, 50);
             } else {
                 symbols.show();
-                 $('#'+id).text("Hide Numbers/Symbols");
+                $('#'+id).text("Hide Numbers/Symbols");
+                adjustFrameHeight();
             }
-           symbols.focus();
+            symbols.focus();
             break;
         case 'submit':
             $('#submit').focus();
@@ -82,18 +85,20 @@ function processKeydown(e){
         if (settings.autoscan && !(autoscan_on)){ 
             startScan(); 
         } else {
-    
-        resetTime();
 
         switch(target.tagName){
 
             case 'DIV': case 'SECTION':
                 $(target).children()[0].focus();
+                resetTime();
                 break;
-            case 'BUTTON': processButton(target.id); break;
+            case 'BUTTON': 
+                processButton(target.id); 
+                stopScan();
+                break;
             case 'SPAN':   
-                window.parent.postMessage(target.innerText, "*");  
-
+                window.parent.postMessage(target.innerText, "*"); 
+                
                 if ($(target).closest('div')[0].id=='letters_div'){
                     $('#letters_div').children()[0].focus();
                 } else {
@@ -104,11 +109,21 @@ function processKeydown(e){
                     caps_on=false;
                     updateLetters();
                 } 
+                resetTime();
                 break;
         }
             
         }
     }
+}
+
+function adjustFrameHeight(height){
+    if (!height){
+        window.parent.postMessage(["keyboard-height", $(document).height()], "*");
+    } else {
+        window.parent.postMessage(["keyboard-height", height], "*");
+    }
+        
 }
 
 var caps_on = false;
@@ -125,9 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         if (message == 'keyboard focus'){
-        
-        //adjust height
-    window.parent.postMessage(["keyboard-height", $(document).height()], "*")
+            adjustFrameHeight();
             resetFocus(); 
         }  
     });

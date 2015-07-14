@@ -1,27 +1,28 @@
 /* INJECTING IFRAMES AND STYLES */
 
-function injectPanel(){
-    
-    var panel = document.createElement('iframe');
-    panel.id = 'panel-frame';
-    panel.src = chrome.extension.getURL("panel.html");  
-    document.body.appendChild(panel);
-    
+function styleFrame(iframe){
     var style = [
         "z-index: 100;", 
         "background-color: rgb(255,255,255);",
         "position: fixed;",
-        "width: 99%;",
-        "height: 70px;",
+        "width: 100%;",
+        "height: 0px;",
         "bottom: 0px;",
-        "border: solid black 3px;"
+        "box-shadow: 10px 0px 2px black;"
     ];
-    
     var style_txt = "";
     for (var i=0;i<style.length;i++){
         style_txt += style[i];
     }    
-    panel.style.cssText = style_txt;  
+    iframe.style.cssText = style_txt; 
+}
+
+function injectPanel(){
+    var panel = document.createElement('iframe');
+    panel.id = 'panel-frame';
+    panel.src = chrome.extension.getURL("panel.html"); 
+    styleFrame(panel);
+    document.body.appendChild(panel);
     
     var padding = document.createElement("div"); 
     padding.id="keyboard-space-padding";
@@ -33,24 +34,8 @@ function injectKeyboard(){
     var keyboard = document.createElement("iframe"); 
     keyboard.id = 'keyboard-frame';
     keyboard.src = chrome.extension.getURL("keyboard.html"); 
- 
-    var style = [
-        "display: none;",
-        "width: 99%;",
-        "height: auto;",  //includes hidden section
-        "z-index: 100;", 
-        "position: fixed;",
-        "bottom: 1px;",
-        "background-color: rgb(255,255,255);",
-        "border: solid black 3px;",
-        "margin: auto;"
-    ];
-    
-    var style_txt = "";
-    for (var i=0;i<style.length;i++){
-        style_txt += style[i];
-    }    
-    keyboard.style.cssText = style_txt;    
+    styleFrame(keyboard);   
+    keyboard.style.display = "none";
     document.documentElement.appendChild(keyboard); 
 }
 
@@ -156,7 +141,6 @@ function submitInput(){
 function findClosestSubmit(selector){ //return 'submit' closest to active text field  
     var submits = $(selector);
     var text = $('.active-text-field');
-    console.log(text[0]);
     
     var min_dist = getDistanceBetweenEls(text[0], submits[0]);
     var closest_submit = submits[0];
@@ -169,7 +153,6 @@ function findClosestSubmit(selector){ //return 'submit' closest to active text f
         }
     });
     //if none found, try last child of <form>?, id with 'submit' in it
-    console.log(closest_submit)
     return closest_submit;
 }
 
@@ -344,7 +327,6 @@ function sectionOff(selector){
             && isSmallEnough($(this))
            ){
             $(this).addClass('conceptual-section');  
-//            console.log(this);
         }
     });    
 }
@@ -511,11 +493,11 @@ function getDistanceBetweenEls(el1, el2){
     return Math.sqrt(a*a+b*b);
 }
 
-function regainFocus(){        
-    if  ($('#keyboard-frame')[0].style.display != 'none'){
-        chrome.runtime.sendMessage("keyboard focus");         
-    } else {
+function regainFocus(){   
+    if  ($('#keyboard-frame')[0].style.display == 'none'){
         chrome.runtime.sendMessage("panel focus"); 
+    } else {
+        chrome.runtime.sendMessage("keyboard focus");         
     } 
 }
 
@@ -523,7 +505,6 @@ chrome.runtime.onMessage.addListener( //from the background page
   function(message, sender, sendResponse) {
     window.find(message, false, false, true, false, false,true);
 });
-
 
 /* MAIN FUNCTION SWITCH */
  
@@ -571,16 +552,21 @@ window.addEventListener("message", function(event){
 /*  
 
 To do:
+    - get icons
+    - better styling?
+    - reduce autoscan increment to 0.25?
+
     - access iframes
     - reformat radio buttons/inputs in the wild to match my options page
     - override bookmarks page
-    - refactor/clarify/document code
-    - deal with pages that open their own popups
+    - inject into popups
     
     - correct active tab querying with >1 window
     - detect http/https errors and other valid/nonvalid urls
         -less important with Google and bookmarking?
     - have my popups center on screen
+    - panels resize with window.onresize
+    - refactor/clarify/document code
     
 To do later:
     -creation of page-specific buttons
@@ -589,9 +575,9 @@ To do later:
     -other controls (window snapping, volume controls)
     -connect the "search" function with link selection
     -store keyboards as json objects and allow different layouts
+    -word completion
 
 https://object.io/site/2011/enter-git-flow/
-mousetrap (create keyboard shortcuts) 
 -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
 cygwin
 

@@ -72,9 +72,15 @@ function blurHandler(){
     }, 300); //wait for the new element to get the focus
 }
 
+//function onResize(){
+//    window.parent.postMessage(["panel-height", $(document).height()], "*");
+//}
+//window.addEventListener("resize", onResize);
+
+
 document.addEventListener('DOMContentLoaded', function() {
     //make panel-frame resize
-    window.parent.postMessage(["panel-height", $(document).height()], "*"); 
+    window.parent.postMessage(["panel-height", $(document).height()], "*");
     
     setTabIndex();
     setUpNavigation();

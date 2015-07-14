@@ -3,7 +3,7 @@
 
     "name": "Chrome Switch Access",
     "description": "Switch access for navigating web pages and browser controls",
-    "version": "0.5",
+    "version": "0.0.0.1",
 
     "background": {
         "scripts": ["jquery-1.11.3.min.js", "background.js"]
