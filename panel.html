@@ -15,13 +15,14 @@
         }
     </style>
     
-    <script src="autoscan.js"></script>  
-    <script src="panel.js"></script>  
-    <script src="jquery-1.11.3.min.js"></script>
+    <script src="js/autoscan.js"></script>  
+    <script src="js/panel.js"></script>  
+    <script src="js/jquery-1.11.3.min.js"></script>
 
 </head>
   
 <body>
+    <button id="test">Click</button>
     <section id='scroll-controls'>
         <button id='down'>Scroll Down</button>
         <button id='up'>Scroll Up</button>
@@ -48,6 +49,8 @@
     
     <section>
         <button id='open'>Open Keyboard</button>
+        <button id="bookmarks"> View Bookmarks </button>
+        <button id="add-bookmark"> Bookmark this Page </button>
         <button id='settings'> Extension Settings </button>
     </section>
     
@@ -58,9 +61,8 @@
        <button id='zoom-in'> Zoom In </button>
         <button id='zoom-out'> Zoom Out </button>
     </section>
-        
+    
 <!--
-//Not useful until ability to snap windows to sides is implemented
     <section id="window-controls">
         <button id='open-window'> New window </button>
         <button id='change-window'> Change window </button>

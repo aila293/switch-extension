@@ -27,7 +27,7 @@ function injectPanel(){
     var padding = document.createElement("div"); 
     padding.id="keyboard-space-padding";
     padding.style.height = panel.style.height;
-    document.body.appendChild(padding);
+    document.body.appendChild(padding);   
 }
 
 function injectKeyboard(){ 
@@ -52,6 +52,7 @@ function addStyle(selector, style_rules){ //strings
     rule.textContent = (selector + " " + style_rules);
     document.head.appendChild(rule);
 }
+
 
 document.addEventListener("DOMContentLoaded", injectKeyboard(), false);
 document.addEventListener("DOMContentLoaded", injectPanel(), false);
@@ -540,7 +541,7 @@ window.addEventListener("message", function(event){
             case 'forward': window.history.forward(); break;
                 
             //send to background- requires chrome.tabs/chrome.windows
-            case 'reload': case 'new-tab': case 'close-tab': case 'change-tab': case 'change-url': case 'find': case 'zoom-in': case 'zoom-out': case 'settings': chrome.runtime.sendMessage(event.data); break;
+            case 'reload': case 'new-tab': case 'close-tab': case 'change-tab': case 'change-url': case 'find': case 'zoom-in': case 'zoom-out': case 'settings': case 'bookmarks': case 'add-bookmark':  chrome.runtime.sendMessage(event.data); break;
             
             default: typeToInput(event.data);
         }
@@ -552,33 +553,33 @@ window.addEventListener("message", function(event){
 /*  
 
 To do:
-    - get icons
-    - better styling?
-    - reduce autoscan increment to 0.25?
+    - word completion, icons/promo images
 
+    - better bookmark features
+        - "add-bookmark" success confirmation
+        - choose name of bookmark
+        - hierarchical navigation of bookmarks page
+        
     - access iframes
     - reformat radio buttons/inputs in the wild to match my options page
-    - override bookmarks page
     - inject into popups
     
     - correct active tab querying with >1 window
     - detect http/https errors and other valid/nonvalid urls
         -less important with Google and bookmarking?
     - have my popups center on screen
-    - panels resize with window.onresize
+    - iframes resize with window.onresize
     - refactor/clarify/document code
     
 To do later:
     -creation of page-specific buttons
     -replace focus-reliance with a class?
-    -better autoscan (with delay in beginning of section, different times for sections vs single elements)
+    -better autoscan ( delay in beginning of section, different times for sections vs single elements)
     -other controls (window snapping, volume controls)
     -connect the "search" function with link selection
     -store keyboards as json objects and allow different layouts
-    -word completion
 
 https://object.io/site/2011/enter-git-flow/
 -https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
 cygwin
-
 */

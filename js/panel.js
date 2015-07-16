@@ -18,48 +18,47 @@ function setUpNavigation(){
 };
 
 function processKeydown(e){
-        e.stopPropagation();
-        e.preventDefault();    
-        var target = e.target;
-        
-        if (e.which == settings.select_code){
-            
-            if (settings.autoscan && !(autoscan_on)){ 
-                startScan(); 
-            } else {
-                
-            if (target.tagName == 'BUTTON'){
-                window.parent.postMessage(target.id, "*")
-                $(target).prevAll().last().focus();
-                stopScan();
+    e.stopPropagation();
+    e.preventDefault();    
+    var target = e.target;
 
-            } else { //section
-                if (target.id=='interaction-controls'
-                && !($('#next-section').is(':visible'))){
-                    window.parent.postMessage("map-sections", "*");
-                    
-                } else {
-                    $(target).children().first().focus();
-                }
-                resetTime();
-            }
-                
-            }
-            
-        } else if (e.which == settings.scan_code){
-            var next = $(target).next();
-            if (next.length == 0){
-                if (target.tagName == 'BUTTON'){
-                    $(target).parent().focus();
-                } else {
-                    setFirstSectionFocus();
-                }
+    if (e.which == settings.select_code){
+
+        if (settings.autoscan && !(autoscan_on)){ 
+            startScan(); 
+        } else {
+
+        if (target.tagName == 'BUTTON'){
+            window.parent.postMessage(target.id, "*")
+            $(target).prevAll().last().focus();
+            stopScan();
+
+        } else { //section
+            if (target.id=='interaction-controls'
+            && !($('#next-section').is(':visible'))){
+                window.parent.postMessage("map-sections", "*");
+
             } else {
-                next.focus();
+                $(target).children().first().focus();
             }
-        }        
-     
-    }
+            resetTime();
+        }
+
+        }
+
+    } else if (e.which == settings.scan_code){
+        var next = $(target).next();
+        if (next.length == 0){
+            if (target.tagName == 'BUTTON'){
+                $(target).parent().focus();
+            } else {
+                setFirstSectionFocus();
+            }
+        } else {
+            next.focus();
+        }
+    }        
+}
 
 function blurHandler(){
     window.setTimeout(function(){
@@ -86,6 +85,19 @@ document.addEventListener('DOMContentLoaded', function() {
     setUpNavigation();
     $('#interaction-controls').children().first().hide();
     setFirstSectionFocus();
+    
+    
+    //PREDICTKEY TESTING
+    $("button#test").click(function(){
+        $.post("http://api.predictkey.com/predict",
+        {
+            "text": "It will use context of past text to predict the next word that is most ",
+            "apikey": "demo"
+        },
+        function(data, status){alert(data.results[0].word);},
+        "json"
+        );
+    });
     
     $('*').blur(blurHandler);
 

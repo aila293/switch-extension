@@ -6,19 +6,33 @@ var punctuation = ['space','backspace','new line',',','.',
 
 var capitals = ['E','T','A','O','I','N','S','H','R','D','L','U','C','M','F','W','Y','P','V','B','G','K','J','Q','X','Z'];
 
-
 var symbols = ['1','2','3','4','5',
                '6','7','8','9','0',
                '$','&','*','(',')',
                '%','^','+','=', '\\',
                '[',']','{','}','|','~'];
 
-function loadKeys(arr, section, tab_offset){
+function loadKeys(arr, name){
     var size = 5; //section size
+    var section_index =1;
+    var div = document.getElementById(name+"_div");
+    
+    function incrementSection(){
+        var sect = document.createElement("section");
+        sect.id = name + section_index;
+        section_index++;
+        div.appendChild(sect);
+        return sect;
+    }
+    var current_section = incrementSection();
+    
     for (var i=0;i<arr.length;i++){
-        if ((i>0 && arr.length-i>=size) && i%size==0){section = section.next();}
-        section.append("<span tabindex='"+(i+tab_offset)+"'>"+arr[i]+"</span>");
+        if ((i>0 && arr.length-i>=size) && i%size==0){
+            current_section = incrementSection();       
+        }
+        current_section.innerHTML += "<span>"+arr[i]+"</span>";
     }   
+    current_section.className = "last";
 }
 
 function resetFocus(){ $('div').first().focus(); }
@@ -128,9 +142,13 @@ function adjustFrameHeight(height){
 
 var caps_on = false;
 document.addEventListener('DOMContentLoaded', function() {
-    loadKeys(letters, $('#letters1'), 2);
-    loadKeys(punctuation, $('#punctuation1'), $('#punctuation1')[0].tabIndex + 1);
-    loadKeys(symbols, $('#symbols1'), $('#symbols1')[0].tabIndex + 1)
+    loadKeys(letters, "letters");
+    loadKeys(punctuation, "punctuation");
+    loadKeys(symbols, "symbols");
+    
+    $('div,section,span,button').each(function(index,element){
+        this.tabIndex = index;
+    });
     
     initiateAutoscan(function(){
         $('div, section, button, span').keydown(function(e){

@@ -2,11 +2,11 @@
     "manifest_version": 2,
 
     "name": "Chrome Switch Access",
-    "description": "Switch access for navigating web pages and browser controls",
+    "description": "Switch access for web navigation and browser controls",
     "version": "0.0.0.1",
 
     "background": {
-        "scripts": ["jquery-1.11.3.min.js", "background.js"]
+        "scripts": ["js/jquery-1.11.3.min.js", "js/background.js"]
     }, 
 
     "permissions": [
@@ -15,19 +15,25 @@
         "tabs", 
         "storage", 
         "webRequest",
-        "webNavigation"
+        "webNavigation",
+        "bookmarks"
     ],
 
     "content_scripts": [
         {
         "matches": ["<all_urls>"],            
-        "js": ["jquery-1.11.3.min.js", "controls.js", "keyboard.js", "panel.js"]
+        "js": ["js/jquery-1.11.3.min.js", "js/controls.js", "js/keyboard.js", "js/panel.js"]
         }
     ],
-
+        
     "web_accessible_resources": [
-        "*.html" //specify own html pages (keyboard, panel) later?
-    ],
+        "keyboard.html", 
+        "options.html", 
+        "panel.html",
+        "popup.html",
+        "popup-keyboard.html",
+        "js/*.js"
+      ],
 
     "options_ui": {
         "page": "options.html",

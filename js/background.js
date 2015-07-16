@@ -41,6 +41,12 @@ function openPopup(purpose){
     }
 }
 
+function addBookmark(){
+    chrome.tabs.query({active: true}, function(tabs){
+        chrome.bookmarks.create({parentId: '1', title: tabs[0].title, url: tabs[0].url});
+    });    
+}
+
 function openTab(url){
     switch(url){
         case 'new-tab':
@@ -51,8 +57,10 @@ function openTab(url){
             });
             break;
         case 'settings':
-            var settings_url = "chrome-extension://"+ chrome.runtime.id + "/options.html";
-            chrome.tabs.create({url: settings_url});
+            chrome.tabs.create({url: chrome.extension.getURL("options.html")});
+            break;
+        case 'bookmarks':
+            chrome.tabs.create({url: chrome.extension.getURL("bookmarks.html")});
             break;
     }
 }
@@ -60,6 +68,7 @@ function openTab(url){
 var browser_tabs;
 chrome.runtime.onMessage.addListener( //from the content script 
     function(message, sender, sendResponse) {
+        console.log(message);
         switch(message){
                 
             //relay to iframes
@@ -74,11 +83,12 @@ chrome.runtime.onMessage.addListener( //from the content script
             
             //use chrome.tabs
             case 'reload': chrome.tabs.reload(); break;
-            case 'new-tab': case 'settings': openTab(message); break;
+            case 'new-tab': case 'settings': case 'bookmarks': openTab(message); break;
             case 'close-tab': getActiveTab(remove); break;
             case 'change-url': case 'find': openPopup(message); break;
             case 'change-tab': changeTab(); break;
             case 'zoom-in': case 'zoom-out': zoom(message); break;
+            case 'add-bookmark': addBookmark(); break;
       }
   });
 
