@@ -6,7 +6,9 @@ function saveOptions(event) {
     var newtab_option = $('input[name="newtab-page"]:checked');
     var url = newtab_option.val();
     if (url == 'other'){
-        url = $('input[name="custom-url"]').val(); 
+        url = $('#custom-url').val(); 
+    } else if (url == "bookmarks"){
+        url = chrome.extension.getURL("bookmarks.html");
     }
     var url_index = newtab_option.prevAll('input').length;  
         
@@ -18,9 +20,10 @@ function saveOptions(event) {
         newtab_url: url, 
         newtab_index: url_index
     }, function() {
-        $('#status').text('Preferences saved');
+        var status = $('#status');
+        status.text('Preferences saved');
         setTimeout(function() {
-          $('#status').text('');
+          status.text('');
         }, 2000);
 
         stopScan();
@@ -60,7 +63,9 @@ function restoreOptions() {
         $('span#scan_value').text(items.scan_rate);
 
         $('input[name="newtab-page"]')[items.newtab_index].checked=true;
-        $('input[name="custom-url"]').val(items.newtab_url);
+        if ($("input[value='other']")[0].checked){
+            $("#custom-url").val(items.newtab_url);
+        }
     });
 }
 
@@ -107,7 +112,7 @@ function processKeydown(e){
         } else {
             stopScan();
             e.target.click();
-            if (e.target.name=='custom-url'){
+            if (e.target.value=='other'){
                 chrome.windows.create({'url': 'popup-keyboard.html?newtaburl', 'width': 600, 'height': 400, 'type': 'popup'}, function(window) {}); 
             }
         }
@@ -136,34 +141,36 @@ function adjustScanRate(e, increment){
     span.text(val);    
 }
 
+function closePage(){
+    chrome.tabs.query({active: true}, function(tabs){
+        if (tabs[0].title == "Extensions"){ 
+            //adapted from popup.js getOptionsPage
+             var pages = chrome.extension.getViews();
+            for (var i=0;i<pages.length;i++){
+                if (pages[i] !== chrome.extension.getBackgroundPage()){ 
+                    pages[i].close(); 
+                }
+            }
+        } else {
+            chrome.tabs.remove(tabs[0].id);   
+        }
+    });
+}
+
 function setupPage(){
     restoreOptions();
     setupNavigation();
     
     $('#save').click(saveOptions);
-    $('#exit').click(function(e){
-        e.preventDefault();
-        chrome.tabs.query({active: true}, function(tabs){
-            if (tabs[0].title == "Extensions"){ 
-                //adopted from popup.js getOptionsPage
-                 var pages = chrome.extension.getViews();
-                for (var i=0;i<pages.length;i++){
-                    if (pages[i] !== chrome.extension.getBackgroundPage()){ 
-                        pages[i].close(); 
-                    }
-                }
-            } else {
-                chrome.tabs.remove(tabs[0].id);   
-            }
-        }); 
-    });
+    $('#exit').click(function(e){e.preventDefault(); closePage();}); 
+    
     $('#increase').click(function(e){adjustScanRate(e,true);});
     $('#decrease').click(function(e){adjustScanRate(e,false);});
     
     $('input[name="auto-scan"]').click(function(){adaptAutoscan(this.value=="on");});
     
     $('button.set').click(function(e){
-        e.preventDefault(); //otherwise page will reset
+        e.preventDefault(); 
         if ($(this).is('.scan')){var url = 'popup.html?scankey';}
         else {var url = 'popup.html?selectkey'}
         chrome.windows.create({'url': url, 'width': 250, 'height': 150, 'type': 'popup'}, function(window) {}); 
@@ -174,14 +181,18 @@ function setupPage(){
 document.addEventListener('DOMContentLoaded', setupPage);
 
 window.addEventListener("message", function(event){
-    if (event.data[0] == "scankey"){
-        $('span.scan')[0].id = event.data[1];
-        $('span.scan').text(keyCodeMap[event.data[1]] + "  ");
-    } else if (event.data[0] == "selectkey"){
-        $('span.select')[0].id = event.data[1];
-        $('span.select').text(keyCodeMap[event.data[1]]+ "  ");
-    } else { //newtaburl
-         $('input[name="custom-url"]').val(event.data[1]);
+    switch(event.data[0]){
+        case "scankey":
+            $('span.scan')[0].id = event.data[1];
+            $('span.scan').text(keyCodeMap[event.data[1]] + "  ");
+            break;
+        case "selectkey":
+            $('span.select')[0].id = event.data[1];
+            $('span.select').text(keyCodeMap[event.data[1]]+ "  ");
+            break;
+        case "newtab-url":
+            $('#custom-url').val(event.data[1]);
+            break;
     }
 });
 
