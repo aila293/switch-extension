@@ -25,7 +25,7 @@ function injectPanel(){
     document.body.appendChild(panel);
     
     var padding = document.createElement("div"); 
-    padding.id="keyboard-space-padding";
+    padding.id="panel-space-padding";
     padding.style.height = panel.style.height;
     document.body.appendChild(padding);   
 }
@@ -78,7 +78,7 @@ function openKeyboard(){
     var keyboard = $("#keyboard-frame");
     if (keyboard[0].style.display == 'none'){
         keyboard.show();
-        $("#keyboard-space-padding").height(keyboard.height());
+        $("#panel-space-padding").height(keyboard.height());
     }
         chrome.runtime.sendMessage("keyboard focus");
     
@@ -100,7 +100,7 @@ function nextInput(){
 
 function closeKeyboard(){
     $("#keyboard-frame").hide();
-    $("#keyboard-space-padding").height($('#panel-frame').height());
+    $("#panel-space-padding").height($('#panel-frame').height());
     chrome.runtime.sendMessage("panel focus");        
 }
 
@@ -463,7 +463,7 @@ function isVisible(element){ //DOM element
         offset = $('#keyboard-frame').height();
     }
     return (rect.bottom > 0) //false if element above screen
-            && (rect.top + offset <window.innerHeight - $('#keyboard-space-padding').height()) //false if below screen
+            && (rect.top + offset <window.innerHeight - $('#panel-space-padding').height()) //false if below screen
             && (rect.right>0)
             && (rect.left<window.innerWidth)
             && (window.getComputedStyle(element)
@@ -516,8 +516,10 @@ window.addEventListener("message", function(event){
     if (event.origin.indexOf(my_origin) != -1){ 
         if (event.data[0] == "panel-height"){
             $('#panel-frame').height(event.data[1]+5);
+            $('#panel-space-padding').height(event.data[1]+5);
         } else if (event.data[0] == "keyboard-height"){
             $('#keyboard-frame').height(event.data[1]+5);
+            $('#panel-space-padding').height(event.data[1]+5);            
         } else {
             
         switch(event.data){
@@ -573,22 +575,20 @@ To do:
         - choose name of bookmark + parent folder before adding
             -success confirmation message
         - remove bookmarks
+        - change "add bookmark" to "remove bookmark" if on a bookmarked page
         
     - access iframes
     - reformat radio buttons/inputs in the wild to match my options page
     - inject into popups
-    - refactor/clarify/document code
-
-Details:
-    - correct active tab querying with >1 window
     - detect http/https (less important w/ Google + bookmarks?)
-    - position my popups on screen?
-    - iframes resize with window.onresize
+        - no checking, just let user input url
+    - adapt my popups to their purpose more 
+    - refactor/clarify/document code
     
 To do later:
     -creation of page-specific buttons
     -replace focus-reliance with a class?
-    -better autoscan ( delay in beginning of section, different times for sections vs single elements)?
+    -better autoscan (delay in beginning of section, different times for sections vs single elements)?
     -other controls (window snapping, volume controls)
     -connect the "search" function with link selection
     -store keyboards as json objects and allow different layouts
@@ -598,30 +598,40 @@ https://object.io/site/2011/enter-git-flow/
 cygwin
 */
 
+//
+//var observer = new MutationObserver(function(mutations) {
+//  mutations.forEach(function(mutation) {
+//    var nodes = mutation.addedNodes;
+//     for (var i = 0; i < nodes.length; ++i) {
+//        $(nodes[i]).keyup(function(e){
+//             if (e.which == 80){//P
+//                console.log(AlertPrevWord());
+//            }           
+//        });  // Calling myNodeList.item(i) isn't necessary in JavaScript
+//     }
+//  });    
+//});
+//
+//    var config = {childList: true, subtree:true };
+//    observer.observe(document, config);
 
-var observer = new MutationObserver(function(mutations) {
-  mutations.forEach(function(mutation) {
-    var nodes = mutation.addedNodes;
-     for (var i = 0; i < nodes.length; ++i) {
-        $(nodes[i]).keyup(function(e){
-             if (e.which == 80){//P
-                console.log(AlertPrevWord());
-            }           
-        });  // Calling myNodeList.item(i) isn't necessary in JavaScript
-     }
-  });    
-});
+//$(document).keyup(function(e){
+//    if (e.which == 80){//P
+//        console.log(AlertPrevWord());
+//    }
+//});   
 
-    var config = {childList: true, subtree:true };
-    observer.observe(document, config);
-
-
-$(document).keyup(function(e){
-    if (e.which == 80){//P
-        console.log(AlertPrevWord());
-    }
-});   
-
+//$(document).on( "keydown", "div,input", function( e ) {
+//    if(e.which == 80){
+//        e.preventDefault();
+//        e.stopPropagation();
+//        console.log(AlertPrevWord());
+//    }
+//});
+//$(document).on( "click", "input,div", function( e ) {
+//    e.stopPropagation();
+//    console.log(AlertPrevWord());
+//});
 
     function AlertPrevWord() {
         var text = getActiveElement();

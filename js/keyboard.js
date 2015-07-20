@@ -59,7 +59,7 @@ function processButton(id){
             if (symbols.is(':visible')){
                 symbols.hide();
                 $('#'+id).text("Show Numbers/Symbols");
-                adjustFrameHeight($(document).height()-50);
+                adjustFrameHeight($(document).height()-150);
                 setTimeout(adjustFrameHeight, 50);
             } else {
                 symbols.show();
@@ -71,6 +71,7 @@ function processButton(id){
         case 'submit':
             $('#submit').focus();
             window.parent.postMessage(id, "*");   
+            break;
         default:
             resetFocus();
             window.parent.postMessage(id, "*");   
@@ -132,12 +133,14 @@ function processKeydown(e){
 }
 
 function adjustFrameHeight(height){
-    if (!height){
-        window.parent.postMessage(["keyboard-height", $(document).height()], "*");
-    } else {
-        window.parent.postMessage(["keyboard-height", height], "*");
+    if (!height) height = $(document).height();
+    try { //if in the popup keyboard
+        chrome.windows.getLastFocused(function(window){
+            chrome.windows.update(window.id, {height: height+60});
+        });
+    } catch(e){ //if from the iframe
+        window.parent.postMessage(["keyboard-height", height], "*");      
     }
-        
 }
 
 var caps_on = false;

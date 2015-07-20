@@ -142,7 +142,7 @@ function adjustScanRate(e, increment){
 }
 
 function closePage(){
-    chrome.tabs.query({active: true}, function(tabs){
+    chrome.tabs.query({active: true, lastFocusedWindow:true}, function(tabs){
         if (tabs[0].title == "Extensions"){ 
             //adapted from popup.js getOptionsPage
              var pages = chrome.extension.getViews();

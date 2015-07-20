@@ -1,5 +1,5 @@
 function getActiveTab(callback){
-    chrome.tabs.query({active: true}, function(tabs){
+    chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
         callback(tabs[0].id);
     });
 }
@@ -30,7 +30,10 @@ function changeTab(){
     });    
 }
 
+var main_window_tab_id;
+
 function openPopup(purpose){
+    getActiveTab(function(tabid){main_window_tab_id = tabid;});
     switch (purpose){
         case 'find':
             chrome.windows.create({'url': 'popup-keyboard.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
@@ -42,7 +45,7 @@ function openPopup(purpose){
 }
 
 function addBookmark(){
-    chrome.tabs.query({active: true}, function(tabs){
+    chrome.tabs.query({active: true, lastFocusedWindow:true}, function(tabs){
         chrome.bookmarks.create({parentId: '1', title: tabs[0].title, url: tabs[0].url});
     });    
 }
@@ -68,7 +71,6 @@ function openTab(url){
 var browser_tabs;
 chrome.runtime.onMessage.addListener( //from the content script 
     function(message, sender, sendResponse) {
-        console.log(message);
         switch(message){
                 
             //relay to iframes
@@ -76,7 +78,7 @@ chrome.runtime.onMessage.addListener( //from the content script
             case "panel focus":
             case "sectioning-on":
             case "sectioning-off":
-                chrome.tabs.query({active: true}, function(tabs){
+                chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
                     chrome.tabs.sendMessage(tabs[0].id, message);
                 });
                 break;
@@ -102,17 +104,10 @@ window.addEventListener("message", function(event){
             chrome.tabs.update(tabid, {active: true});
             break;
         case 'find':
-            chrome.windows.getAll({populate:true}, function(windows){
-                chrome.tabs.query({active: true}, function(tabs){
-                    chrome.tabs.sendMessage(tabs[0].id, event.data[1]);
-                });
-            });
+            chrome.tabs.sendMessage(main_window_tab_id, event.data[1]);
             break;
         case 'change-url':
-            var intended_url;
-            chrome.tabs.query({active: true}, function(tabs){
-                intended_url = event.data[1];
-                chrome.tabs.update(tabs[0].id, {url: intended_url}, function(tab){});
+            chrome.tabs.update(main_window_tab_id, {url: event.data[1]}, function(tab){});
                 
         //attempts to detect failure
             chrome.webRequest.onErrorOccurred.addListener(function(details){
@@ -134,7 +129,6 @@ window.addEventListener("message", function(event){
                 }
             });
                 
-            }); //end of chrome.tabs.query
             break;            
       }
 });

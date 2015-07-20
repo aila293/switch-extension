@@ -68,9 +68,10 @@ function changeUrl(){
     document.title = "Enter new URL";
 
     var input = document.createElement('input');
-    input.value = "https://www."; 
+    input.value = "http://www."; 
     input.size="50";
     $(input).insertBefore('#keyboard');            
+
     $('#punctuation3').insertBefore($("#punctuation2"));
     $('section').first().focus();
     $('#punctuation1').children()[2].innerText = '.com'; //change 'newline' key to '.com' key for urls

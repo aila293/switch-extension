@@ -79,7 +79,7 @@ function processKeydown(e){
 
 function processButton(id){
     switch (id){
-        case 'close': closeTab(); break;
+        case 'close': closePage(); break;
         case 'delete': 
             
             //let user scan multiple bookmarks to delete
@@ -93,8 +93,8 @@ function processButton(id){
     }
 }
 
-function closeTab(){
-    chrome.tabs.query({active: true}, function(tabs){
+function closePage(){
+    chrome.tabs.query({active: true, lastFocusedWindow:true}, function(tabs){
             chrome.tabs.remove(tabs[0].id);
     });
 }
