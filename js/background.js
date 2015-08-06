@@ -71,6 +71,14 @@ function openTab(url){
 var browser_tabs;
 chrome.runtime.onMessage.addListener( //from the content script 
     function(message, sender, sendResponse) {
+        
+        if (message.purpose == "current-string"){
+            chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
+                chrome.tabs.sendMessage(tabs[0].id, message.data);
+            });
+            return;
+        }
+        
         switch(message){
                 
             //relay to iframes
@@ -104,9 +112,9 @@ window.addEventListener("message", function(event){
             chrome.tabs.update(tabid, {active: true});
             break;
         case 'find':
-            chrome.tabs.sendMessage(main_window_tab_id, event.data[1]);
+            chrome.tabs.sendMessage(main_window_tab_id, {purpose: "find", data: event.data[1]});
             break;
-        case 'change-url':
+        case 'changeurl':
             chrome.tabs.update(main_window_tab_id, {url: event.data[1]}, function(tab){});
                 
         //attempts to detect failure

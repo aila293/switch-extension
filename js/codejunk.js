@@ -1,5 +1,18 @@
 
 
+
+//PredictKey testing
+$.post("http://api.predictkey.com/predict",
+    {
+        "text": "It will use context of past text to predict the next word that is most ",
+        "apikey": "demo"
+    },
+    function(data, status){
+        alert(data.results[0].word);
+    },
+    "json"
+);
+
 //removes all tabs except active one
 //getAllTabs(closeOther);
 function getAllTabs(callback){

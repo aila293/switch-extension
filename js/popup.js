@@ -79,23 +79,8 @@ function changeUrl(){
     //insert cancel button after submit
     var cancel = document.createElement('button');
     cancel.innerText = "Cancel";
-    cancel.id = "cancel";
+    cancel.id = "exit";
     $(cancel).insertAfter('#submit');
-
-    window.addEventListener("message", function(event){
-        if (event.data == 'submit'){
-            if (purpose == "changeurl"){
-                background.postMessage(["change-url", $('input').val()], "*");
-            } else {
-                getOptionsPage().postMessage(["newtab-url", $('input').val()], "*");
-            }
-            closeWindow();
-        } else if (event.data == 'cancel'){
-            closeWindow();
-        } else {
-            typeToInput(event.data);
-        }
-    });
 }
 
 function changeTab(){
@@ -126,18 +111,7 @@ function find(){
     
     $('#submit').text("Search");
 
-    $('section').first().focus();
-
-    window.addEventListener("message", function(event){
-        if (event.data == "submit"){
-            background.postMessage(["find", $('input').val()], "*");
-            $('#submit').focus();
-        } else if (event.data == 'exit'){
-            closeWindow();
-        } else {
-            typeToInput(event.data);
-        }
-    });    
+    $('section').first().focus();  
 }
 
 function setKey(){
@@ -179,3 +153,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
 });
+
+//only used in typing-related popups
+window.addEventListener("message", function(event){
+    switch(event.data){
+        case "submit":
+            
+            switch(purpose){
+                case "newtaburl":
+                    getOptionsPage().postMessage(["newtab-url", $('input').val()], "*");
+                    closeWindow();
+                    break;
+                case "changeurl":
+                     background.postMessage([purpose, $('input').val()], "*");
+                    closeWindow();
+                    break;
+                case "find":
+                    background.postMessage([purpose, $('input').val()], "*");
+                    $('#submit').focus(); 
+                    break;
+            }
+             
+            break;
+        case "exit":
+            closeWindow();
+            break;
+        case "get-word":
+            //do nothing, no word completion
+            break;
+        default:
+            typeToInput(event.data);                
+    }
+});  

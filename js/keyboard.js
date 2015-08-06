@@ -30,12 +30,12 @@ function loadKeys(arr, name){
         if ((i>0 && arr.length-i>=size) && i%size==0){
             current_section = incrementSection();       
         }
-        current_section.innerHTML += "<span>"+arr[i]+"</span>";
+        current_section.innerHTML += "<span>"+(arr[i] || "") +"</span>";
     }   
     current_section.className = "last";
 }
 
-function resetFocus(){ $('div').first().focus(); }
+function resetFocus(){ $('div:visible').first().focus(); }
 
 function updateLetters(){
     var new_letters;
@@ -47,6 +47,20 @@ function updateLetters(){
     });
 }
 
+function toggleSymbols(){
+    var symbols = $('#symbols_div');
+    if (symbols.is(':visible')){
+        symbols.hide();
+        $('#'+id).text("Show Numbers/Symbols");
+        adjustFrameHeight($(document).height()-150);
+        setTimeout(adjustFrameHeight, 50);
+    } else {
+        symbols.show();
+        $('#'+id).text("Hide Numbers/Symbols");
+        adjustFrameHeight();
+    }
+}
+
 function processButton(id){
     switch(id){
         case 'caps':
@@ -55,21 +69,15 @@ function processButton(id){
             $('#letters_div').focus();                  
             break;
         case 'symbols':
-            var symbols = $('#symbols_div');
-            if (symbols.is(':visible')){
-                symbols.hide();
-                $('#'+id).text("Show Numbers/Symbols");
-                adjustFrameHeight($(document).height()-150);
-                setTimeout(adjustFrameHeight, 50);
-            } else {
-                symbols.show();
-                $('#'+id).text("Hide Numbers/Symbols");
-                adjustFrameHeight();
-            }
+            toggleSymbols();
             symbols.focus();
             break;
         case 'submit':
             $('#submit').focus();
+            window.parent.postMessage(id, "*");   
+            break;
+        case 'close':
+            $("#words_div").hide();
             window.parent.postMessage(id, "*");   
             break;
         default:
@@ -89,7 +97,7 @@ function processKeydown(e){
 
         if (next.length==0){
             if (target.tagName == 'DIV'){
-                next = $('div').first();
+                next = $('div:visible').first();
             } else {
                 next = $(target).parent();
             }
@@ -112,14 +120,30 @@ function processKeydown(e){
                 stopScan();
                 break;
             case 'SPAN':   
-                window.parent.postMessage(target.innerText, "*"); 
                 
-                if ($(target).closest('div')[0].id=='letters_div'){
-                    $('#letters_div').children()[0].focus();
+                var div = $(target).closest('div')[0];
+                var text = target.innerText;
+                
+                if (div.id == 'letters_div' || text == "backspace"){
+                    window.parent.postMessage(text, "*"); 
+                    window.parent.postMessage("get-word", "*");
+                    
+                    var words_div = $("#words_div");
+                    if (!(words_div.is(":visible"))){
+                        words_div.show();
+                        adjustFrameHeight();
+                    }
+                    resetFocus();
+                    
+                } else if(div.id == "words_div") {
+                    text = text.substring(current_word.length) + " ";
+                    window.parent.postMessage(text, "*"); 
+                    clearWords();
                 } else {
-                    resetFocus(); 
+                    window.parent.postMessage(text, "*"); 
+                    resetFocus();
                 }
-
+                
                 if (caps_on){
                     caps_on=false;
                     updateLetters();
@@ -143,11 +167,44 @@ function adjustFrameHeight(height){
     }
 }
 
+var current_word;
+var limit = 15;
+
+function completeWord(str){
+    current_word = str;
+    var count = 0;
+    
+    for (var i=0;i<wordlist.length && count<limit;i++){
+        if (wordlist[i].substring(0,str.length) == str.toLowerCase()){
+            $("#words_div span")[count].innerText = wordlist[i];
+            count++;
+        }
+    }
+
+    for (;count<limit;count++){
+        $("#words_div span")[count].innerText = ""; 
+    }
+}
+
+function clearWords(){
+    $("#words_div span").each(function(){this.innerText = ""});
+    $("#letters_div").focus();
+}
+
+function addWordSpaces(){
+    var words = document.getElementById("words_div");
+    for (var i=0;i<limit;i++){
+        var span = document.createElement("span");
+        words.appendChild(span);
+    }
+}
+
 var caps_on = false;
 document.addEventListener('DOMContentLoaded', function() {
     loadKeys(letters, "letters");
     loadKeys(punctuation, "punctuation");
     loadKeys(symbols, "symbols");
+    loadKeys(new Array(limit), "words");
     
     $('div,section,span,button').each(function(index,element){
         this.tabIndex = index;
@@ -159,10 +216,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, processKeydown);
     
-    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-        if (message == 'keyboard focus'){
-            adjustFrameHeight();
-            resetFocus(); 
-        }  
-    });
+});
+
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+    if (message == 'keyboard focus'){
+        adjustFrameHeight();
+        resetFocus(); 
+    } else {
+        completeWord(message);
+    }
 });

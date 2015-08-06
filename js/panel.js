@@ -29,9 +29,13 @@ function processKeydown(e){
         } else {
 
         if (target.tagName == 'BUTTON'){
-            window.parent.postMessage(target.id, "*")
-            $(target).prevAll().last().focus();
-            stopScan();
+            if (target.id == "toggle-sections"){
+                window.parent.postMessage("unmap-sections", "*");
+            } else {
+                window.parent.postMessage(target.id, "*")
+                $(target).prevAll().last().focus();
+                stopScan();
+            }
 
         } else { //section
             if (target.id=='interaction-controls'
@@ -86,23 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
     $('#interaction-controls').children().first().hide();
     setFirstSectionFocus();
     
-    
-    //PREDICTKEY TESTING
-    $("button#test").click(function(){
-//        $.post("http://api.predictkey.com/predict",
-//        {
-//            "text": "It will use context of past text to predict the next word that is most ",
-//            "apikey": "demo"
-//        },
-//        function(data, status){
-//            alert(data.results[0].word);
-//        },
-//        "json"
-//        );
-            window.parent.postMessage("test", "*");
-    });
-    
-    
     $('*').blur(blurHandler);
 
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
@@ -112,15 +99,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             case "sectioning-on":
                 $('#interaction-controls button').show();
-                $('#map-sections').text("Re-section the page");
+                $('#toggle-sections').text("Clear sections");
                 $('#next-section').focus();
                 stopScan();
                 break;
             case "sectioning-off":
-                $('#interaction-controls button').hide();
-                $('#map-sections').show();
-                $('#map-sections').text("Interact with the Page");
+                $('#interaction-controls button:not("#toggle-sections")').hide();
+                $('#toggle-sections').text("Interact with the Page");
                 $('#interaction-controls').focus();
+                stopScan();
                 break;              
         }
        

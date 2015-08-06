@@ -16,12 +16,19 @@
             text-align: center;
             margin: 1px;
         }
-        span:focus {
-            color: red;
-            border: solid black !important;
+        #words_div span {
+            border: none;
+            margin-right: 20px;
+        }
+        #words_div section {
+/*            border-right: solid black;*/
+        }
+        span:focus{
             outline: none !important;
         }
-        
+        #letters_div span:focus {
+            color: red;
+        }
         div {
             margin-top: 5px;
             margin-bottom: 5px;
@@ -34,7 +41,7 @@
             display: inline-block;
             margin: 2px 15px 2px 0px;
         }
-        #symbols_div{
+        #symbols_div, #words_div{
             display: none;
         }
         .last{
@@ -43,13 +50,15 @@
     </style>
     
     <script src="js/autoscan.js"></script>  
+    <script src="js/wordlist.js"></script>  
     <script src="js/keyboard.js"></script>  
     <script src="js/jquery-1.11.3.min.js"></script>
 
 </head>
   
 <body>
-
+    <div id="words_div"></div>
+    
     <div id='letters_div'></div>
 
     <div id="punctuation_div"></div>

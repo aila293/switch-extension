@@ -157,6 +157,23 @@ function findClosestSubmit(selector){ //return 'submit' closest to active text f
     return closest_submit;
 }
 
+function getWord(){
+    var text = $(".active-text-field").val();
+    for (var i = text.length-1;i>=0;i--){
+        if (!(isLetter(text,i))){
+            var str = text.substring(i+1);
+            chrome.runtime.sendMessage({purpose: "current-string", data: str});
+            return;
+        }
+    }
+    chrome.runtime.sendMessage({purpose: "current-string", data: text});
+}
+
+function isLetter(str,i){
+    var code = str.charCodeAt(i);
+    return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);  
+}
+
 /* SECTION MAPPING AND NAVIGATION */
 
 var interaction_selectors = "a:visible, input:visible, button:visible";
@@ -496,7 +513,7 @@ function getDistanceBetweenEls(el1, el2){
 
 function regainFocus(){   
     if  ($('#keyboard-frame')[0].style.display == 'none'){
-        chrome.runtime.sendMessage("panel focus"); 
+        //chrome.runtime.sendMessage("panel focus");  TEST
     } else {
         chrome.runtime.sendMessage("keyboard focus");         
     } 
@@ -504,7 +521,9 @@ function regainFocus(){
 
 chrome.runtime.onMessage.addListener( //from the background page
   function(message, sender, sendResponse) {
-    window.find(message, false, false, true, false, false,true);
+      if (message.purpose == "find"){
+          window.find(message.data, false, false, true, false, false,true);
+      }
 });
 
 /* MAIN FUNCTION SWITCH */
@@ -528,6 +547,7 @@ window.addEventListener("message", function(event){
             case 'submit': submitInput(); break;
             case 'close': closeKeyboard();  break;
             case 'next-input': nextInput(); break;
+            case 'get-word': getWord(); break;
                 
             //from control panel iframe
             case 'up': case 'down': case 'top': case 'bottom': scrollWindow(event.data); break;
@@ -542,21 +562,6 @@ window.addEventListener("message", function(event){
             case 'back': window.history.back(); break;
             case 'forward': window.history.forward(); break;
                 
-            case 'test': 
-                
-                //PREDICTKEY
-        $.get("http://api.predictkey.com/predict",
-        {
-            "text": "It will use context to predict the word that is most ",
-            "apikey": "demo"
-        },
-        function(data, status){
-            //alert(data.results[0].word);
-        },
-        "json"
-        );
-                break;
-                
             //send to background- requires chrome.tabs/chrome.windows
             case 'reload': case 'new-tab': case 'close-tab': case 'change-tab': case 'change-url': case 'find': case 'zoom-in': case 'zoom-out': case 'settings': case 'bookmarks': case 'add-bookmark':  chrome.runtime.sendMessage(event.data); break;
             
@@ -569,20 +574,29 @@ window.addEventListener("message", function(event){
 /*  
 
 To do:
-    - word completion, icons/promo images
-    
+    - icons/promo images
+
     - bookmark features
         - choose name of bookmark + parent folder before adding
             -success confirmation message
         - remove bookmarks
         - change "add bookmark" to "remove bookmark" if on a bookmarked page
         
+    - manually created sub-sections can mess up styling 
+    
+    - make space easier to type?
+    - "open keyboard" sometimes freezes, esp w3schools
+    - include purposes in all message-handling switches
+    - include hyphens, apostrophes in "isLetter"?
+    - remove scrollbar from panel/keyboard for looks?
+
+    - adapt word completion by incrementing frequencies?
     - access iframes
     - reformat radio buttons/inputs in the wild to match my options page
     - inject into popups
     - detect http/https (less important w/ Google + bookmarks?)
         - no checking, just let user input url
-    - adapt my popups to their purpose more 
+    - adapt popups to purpose more 
     - refactor/clarify/document code
     
 To do later:
@@ -594,73 +608,5 @@ To do later:
     -store keyboards as json objects and allow different layouts
 
 https://object.io/site/2011/enter-git-flow/
--https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
-cygwin
+
 */
-
-//
-//var observer = new MutationObserver(function(mutations) {
-//  mutations.forEach(function(mutation) {
-//    var nodes = mutation.addedNodes;
-//     for (var i = 0; i < nodes.length; ++i) {
-//        $(nodes[i]).keyup(function(e){
-//             if (e.which == 80){//P
-//                console.log(AlertPrevWord());
-//            }           
-//        });  // Calling myNodeList.item(i) isn't necessary in JavaScript
-//     }
-//  });    
-//});
-//
-//    var config = {childList: true, subtree:true };
-//    observer.observe(document, config);
-
-//$(document).keyup(function(e){
-//    if (e.which == 80){//P
-//        console.log(AlertPrevWord());
-//    }
-//});   
-
-//$(document).on( "keydown", "div,input", function( e ) {
-//    if(e.which == 80){
-//        e.preventDefault();
-//        e.stopPropagation();
-//        console.log(AlertPrevWord());
-//    }
-//});
-//$(document).on( "click", "input,div", function( e ) {
-//    e.stopPropagation();
-//    console.log(AlertPrevWord());
-//});
-
-    function AlertPrevWord() {
-        var text = getActiveElement();
-        var caretPos = text.selectionStart || window.getSelection().anchorOffset;//get the position of the cursor in the element.
-        
-        var word = ReturnWord(text.value || text.innerText, caretPos);//Get the word before the cursor. 
-        if (word != null) {return word;}
-    }
-
-    function ReturnWord(text, caretPos) {
-        var index = text.indexOf(caretPos);//get the index of the cursor
-        var preText = text.substring(0, caretPos);//get all the text between the start of the element and the cursor. 
-        if (preText.indexOf(" ") > 0) {//if there's more then one space character
-            var words = preText.split(" ");//split the words by space
-            return words[words.length - 1]; //return last word
-        }
-        else {return preText;}
-    }
-
-function getActiveElement(document){
-    document = document || window.document;
-    if( document.body === document.activeElement || document.activeElement.tagName == 'IFRAME' ){// Check if the active element is in the main web or iframe
-        var iframes = document.getElementsByTagName('iframe');// Get iframes
-        for(var i = 0; i<iframes.length; i++ ){
-            var focused = getActiveElement( iframes[i].contentWindow.document );// Recall
-            if( focused !== false ){
-                return focused; // The focused
-             }
-         }
-     }
-     else return document.activeElement;
-};
