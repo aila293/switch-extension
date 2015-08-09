@@ -5,12 +5,13 @@
     <style>
         body {
             word-wrap: break-word;
+            overflow: hidden;
         }
         section {
             display: inline-block;
             margin-right: 70px;
         }
-        #interaction-controls button:not(#toggle-sections){
+        #interaction-controls button:not(#unmap-sections){
             display: none;
         }
     </style>
@@ -35,7 +36,7 @@
         <button id='select-section'> Select Section </button>
         <button id='prev-section'> Previous Section </button>
         <button id='back-section'> Go Up a Level </button>
-        <button id='toggle-sections'> Interact with the Page </button>
+        <button id='unmap-sections'> Interact with the Page </button>
     </section>
     
     <section id='page-controls'>
@@ -71,7 +72,7 @@
 -->
     
 <!--    <button id='print'> Print screen </button>
-    //Can't support navigating the iframe pop-up atm-->
+    //Can't support navigating the iframe pop-up -->
 </body>
 
 </html>

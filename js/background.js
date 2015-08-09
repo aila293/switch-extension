@@ -41,13 +41,32 @@ function openPopup(purpose){
         case 'change-url':
             chrome.windows.create({'url': 'popup-keyboard.html?changeurl', 'width': 600, 'height': 400,'type': 'popup'}, function(window) {});
             break;
+        case 'bookmark':
+            chrome.windows.create({'url': 'popup-keyboard.html?bookmark', 'width': 600, 'height': 400,'type': 'popup'}, function(window) {});
+            break;
     }
 }
 
 function addBookmark(){
     chrome.tabs.query({active: true, lastFocusedWindow:true}, function(tabs){
-        chrome.bookmarks.create({parentId: '1', title: tabs[0].title, url: tabs[0].url});
-    });    
+        var url = tabs[0].url;
+        chrome.bookmarks.getTree(function(results){
+            var id = searchBookmarks(results[0], url);    
+            if (id){
+                chrome.bookmarks.remove(id);
+                var report = "not bookmarked";
+            } else {
+                chrome.bookmarks.create({parentId: '1', title: tabs[0].title, url: url});
+                var report = "bookmarked";
+            }
+            
+            chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
+                chrome.tabs.sendMessage(tabs[0].id, report);
+            });
+        });
+
+            
+    }); 
 }
 
 function openTab(url){
@@ -68,6 +87,20 @@ function openTab(url){
     }
 }
 
+function searchBookmarks(root, target){
+    var children = root.children;
+    for (var i=0; i< children.length;i++){
+        var url = children[i].url;
+        if (!url){
+            return searchBookmarks(children[i], target);
+        }
+        if (url == target){
+            return children[i].id;
+        } 
+    }
+    return false;
+}
+
 var browser_tabs;
 chrome.runtime.onMessage.addListener( //from the content script 
     function(message, sender, sendResponse) {
@@ -75,6 +108,13 @@ chrome.runtime.onMessage.addListener( //from the content script
         if (message.purpose == "current-string"){
             chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
                 chrome.tabs.sendMessage(tabs[0].id, message.data);
+            });
+            return;
+        } 
+        
+        if (message.purpose == "current-url"){
+            chrome.bookmarks.getTree(function(results){
+                searchBookmarks(results[0], message.data);
             });
             return;
         }
@@ -99,6 +139,7 @@ chrome.runtime.onMessage.addListener( //from the content script
             case 'change-tab': changeTab(); break;
             case 'zoom-in': case 'zoom-out': zoom(message); break;
             case 'add-bookmark': addBookmark(); break;
+                //change to openPopup(bookmark) when implemented
       }
   });
 
@@ -139,4 +180,20 @@ window.addEventListener("message", function(event){
                 
             break;            
       }
+});
+
+chrome.tabs.onUpdated.addListener(function(id, changeInfo, tab){
+    if (changeInfo.url){
+        chrome.bookmarks.getTree(function(results){
+            var found = searchBookmarks(results[0], changeInfo.url);
+            if (found){
+                var report = "bookmarked";
+            } else {
+                var report = "not bookmarked";
+            }
+            chrome.tabs.query({active: true, lastFocusedWindow: true}, function(tabs){
+                chrome.tabs.sendMessage(tabs[0].id, report);
+            });
+        });
+    }
 });

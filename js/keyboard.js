@@ -105,9 +105,11 @@ function processKeydown(e){
         next.focus();
 
     } else if (e.which == settings.select_code){
+        
         if (settings.autoscan && !(autoscan_on)){ 
             startScan(); 
-        } else {
+            return;
+        } 
 
         switch(target.tagName){
 
@@ -135,7 +137,7 @@ function processKeydown(e){
                     }
                     resetFocus();
                     
-                } else if(div.id == "words_div") {
+                } else if (div.id == "words_div") {
                     text = text.substring(current_word.length) + " ";
                     window.parent.postMessage(text, "*"); 
                     clearWords();
@@ -148,10 +150,8 @@ function processKeydown(e){
                     caps_on=false;
                     updateLetters();
                 } 
-                resetTime();
+                stopScan();
                 break;
-        }
-            
         }
     }
 }
@@ -168,26 +168,32 @@ function adjustFrameHeight(height){
 }
 
 var current_word;
-var limit = 15;
+var limit = 15; //for number of predicted words to show
 
 function completeWord(str){
     current_word = str;
-    var count = 0;
-    
-    for (var i=0;i<wordlist.length && count<limit;i++){
+    var words_div = $("#words_div");
+    words_div.children().remove();
+
+    var word_predictions = [];
+    for (var i=0;i<wordlist.length && word_predictions.length < limit;i++){
         if (wordlist[i].substring(0,str.length) == str.toLowerCase()){
-            $("#words_div span")[count].innerText = wordlist[i];
-            count++;
+            word_predictions.push(wordlist[i]);
         }
     }
-
-    for (;count<limit;count++){
-        $("#words_div span")[count].innerText = ""; 
+    loadKeys(word_predictions, "words");
+    words_div.find('*').each(function(){
+        this.tabIndex = 1; //make focusable
+    });
+    
+    if (word_predictions.length == 0){
+        clearWords();
     }
+    adjustFrameHeight();
 }
 
 function clearWords(){
-    $("#words_div span").each(function(){this.innerText = ""});
+    $("#words_div").hide();
     $("#letters_div").focus();
 }
 
@@ -203,9 +209,7 @@ var caps_on = false;
 document.addEventListener('DOMContentLoaded', function() {
     loadKeys(letters, "letters");
     loadKeys(punctuation, "punctuation");
-    loadKeys(symbols, "symbols");
-    loadKeys(new Array(limit), "words");
-    
+    loadKeys(symbols, "symbols");    
     $('div,section,span,button').each(function(index,element){
         this.tabIndex = index;
     });

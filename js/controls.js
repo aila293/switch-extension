@@ -53,10 +53,9 @@ function addStyle(selector, style_rules){ //strings
     document.head.appendChild(rule);
 }
 
-
-document.addEventListener("DOMContentLoaded", injectKeyboard(), false);
-document.addEventListener("DOMContentLoaded", injectPanel(), false);
-document.addEventListener("DOMContentLoaded", injectMyStyles(), false);
+injectKeyboard();
+injectPanel();
+injectMyStyles(); 
 
 /* IMPLEMENTING TYPING, KEYBOARD, AND TEXT INPUT */
 
@@ -66,7 +65,8 @@ function openKeyboard(){
     var inputs = $(text_selector);
     var active_field = $('.active-text-field');
 
-    if (active_field.length == 0){ //no active field
+    //if no active field, find the first visible text field
+    if (active_field.length == 0){ 
         var txt_index = 0;
         while (!( $(inputs[txt_index]).is(':visible'))){
             txt_index++;
@@ -80,7 +80,7 @@ function openKeyboard(){
         keyboard.show();
         $("#panel-space-padding").height(keyboard.height());
     }
-        chrome.runtime.sendMessage("keyboard focus");
+    chrome.runtime.sendMessage("keyboard focus");
     
     scrollToView($('.active-text-field'));
 }
@@ -153,12 +153,13 @@ function findClosestSubmit(selector){ //return 'submit' closest to active text f
             closest_submit = this;
         }
     });
-    //if none found, try last child of <form>?, id with 'submit' in it
     return closest_submit;
 }
 
 function getWord(){
     var text = $(".active-text-field").val();
+    
+    //traverse the text backward until a non-letter is found
     for (var i = text.length-1;i>=0;i--){
         if (!(isLetter(text,i))){
             var str = text.substring(i+1);
@@ -367,7 +368,7 @@ function mapDOM(){
     sectionOff('ol, ul');
     sectionOff('table');
     sectionOff('article');
-    sectionOff('main'); //sometimes takes up whole page
+    sectionOff('main'); 
     sectionOff('p');
     
     //catch all the rest of the links
@@ -381,7 +382,7 @@ function mapDOM(){
         }
     });
     
-    //remove any nested sections created by previous step
+    //remove any nested sections created by the previous step
     $( ".conceptual-section" ).each(function(){
         if ($(this).parents('.conceptual-section').length != 0){
             $(this).removeClass('conceptual-section');
@@ -398,7 +399,7 @@ function mapDOM(){
         }
     });  
     
-        //group 1-link sections that are part of a nested pattern of links (e.g. 2 siblings of "div a")
+    //group 1-link sections that are part of a nested pattern of links (e.g. 2 siblings of "div a")
     $( ".conceptual-section" ).each(function(){
             var parent = $(this).parent(); 
             var type = this.tagName;
@@ -513,7 +514,7 @@ function getDistanceBetweenEls(el1, el2){
 
 function regainFocus(){   
     if  ($('#keyboard-frame')[0].style.display == 'none'){
-        //chrome.runtime.sendMessage("panel focus");  TEST
+        chrome.runtime.sendMessage("panel focus"); 
     } else {
         chrome.runtime.sendMessage("keyboard focus");         
     } 
@@ -561,6 +562,8 @@ window.addEventListener("message", function(event){
             case 'lost focus': regainFocus(); break;
             case 'back': window.history.back(); break;
             case 'forward': window.history.forward(); break;
+            case "panel-loaded": chrome.runtime.sendMessage({purpose: "current-url", data: window.location.href});
+                break;
                 
             //send to background- requires chrome.tabs/chrome.windows
             case 'reload': case 'new-tab': case 'close-tab': case 'change-tab': case 'change-url': case 'find': case 'zoom-in': case 'zoom-out': case 'settings': case 'bookmarks': case 'add-bookmark':  chrome.runtime.sendMessage(event.data); break;
@@ -573,39 +576,31 @@ window.addEventListener("message", function(event){
 
 /*  
 
-To do:
-    - icons/promo images
+To do:        
 
-    - bookmark features
-        - choose name of bookmark + parent folder before adding
-            -success confirmation message
-        - remove bookmarks
-        - change "add bookmark" to "remove bookmark" if on a bookmarked page
-        
-    - manually created sub-sections can mess up styling 
-    
-    - make space easier to type?
-    - "open keyboard" sometimes freezes, esp w3schools
-    - include purposes in all message-handling switches
-    - include hyphens, apostrophes in "isLetter"?
-    - remove scrollbar from panel/keyboard for looks?
+    - keyboard resizes, but not smaller (most apparent with words_div)
 
-    - adapt word completion by incrementing frequencies?
     - access iframes
-    - reformat radio buttons/inputs in the wild to match my options page
     - inject into popups
-    - detect http/https (less important w/ Google + bookmarks?)
-        - no checking, just let user input url
-    - adapt popups to purpose more 
-    - refactor/clarify/document code
+    - fix http/https issue in url inputting (remove checking)
+    - improve formatting- esp. popups, keyboard 
+    - refactor/clarify/document/diagram code 
     
 To do later:
+    - more bookmarking features (choosing names, parent folders)
+    - reformat radio buttons/inputs ~my options page
     -creation of page-specific buttons
-    -replace focus-reliance with a class?
+    
+To do maybe:
     -better autoscan (delay in beginning of section, different times for sections vs single elements)?
     -other controls (window snapping, volume controls)
-    -connect the "search" function with link selection
-    -store keyboards as json objects and allow different layouts
+    -connect "search" function with link selection
+    -alternative keyboards
+    
+Considerations:
+    - include hyphens, apostrophes in "isLetter"?
+    - manually created sub-sections can mess up styling 
+    - adapt word completion by incrementing frequencies?   
 
 https://object.io/site/2011/enter-git-flow/
 

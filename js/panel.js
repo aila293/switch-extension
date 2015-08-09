@@ -25,29 +25,23 @@ function processKeydown(e){
     if (e.which == settings.select_code){
 
         if (settings.autoscan && !(autoscan_on)){ 
-            startScan(); 
-        } else {
+            startScan();
+            return;
+        } 
 
         if (target.tagName == 'BUTTON'){
-            if (target.id == "toggle-sections"){
-                window.parent.postMessage("unmap-sections", "*");
-            } else {
-                window.parent.postMessage(target.id, "*")
-                $(target).prevAll().last().focus();
-                stopScan();
-            }
+            window.parent.postMessage(target.id, "*")
+            $(target).prevAll().last().focus();
+            stopScan();
 
-        } else { //section
+        } else { //target is a section
             if (target.id=='interaction-controls'
             && !($('#next-section').is(':visible'))){
                 window.parent.postMessage("map-sections", "*");
-
             } else {
                 $(target).children().first().focus();
             }
             resetTime();
-        }
-
         }
 
     } else if (e.which == settings.scan_code){
@@ -75,41 +69,42 @@ function blurHandler(){
     }, 300); //wait for the new element to get the focus
 }
 
-//function onResize(){
-//    window.parent.postMessage(["panel-height", $(document).height()], "*");
-//}
-//window.addEventListener("resize", onResize);
-
-
 document.addEventListener('DOMContentLoaded', function() {
-    //make panel-frame resize
-    window.parent.postMessage(["panel-height", $(document).height()], "*");
+
+    //so text of the bookmark button can be changed
+    window.parent.postMessage("panel-loaded", "*"); 
+    
+    window.parent.postMessage(["panel-height", $(document).height()], "*");  //make panel-frame resize
     
     setTabIndex();
     setUpNavigation();
-    $('#interaction-controls').children().first().hide();
     setFirstSectionFocus();
-    
     $('*').blur(blurHandler);
+});
 
-    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
-        switch(message){
-            case "panel focus":
-                setFirstSectionFocus(); 
-                break;
-            case "sectioning-on":
-                $('#interaction-controls button').show();
-                $('#toggle-sections').text("Clear sections");
-                $('#next-section').focus();
-                stopScan();
-                break;
-            case "sectioning-off":
-                $('#interaction-controls button:not("#toggle-sections")').hide();
-                $('#toggle-sections').text("Interact with the Page");
-                $('#interaction-controls').focus();
-                stopScan();
-                break;              
-        }
-       
-    });
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
+    switch(message){
+        case "panel focus":
+            setFirstSectionFocus(); 
+            break;
+        case "sectioning-on":
+            $('#interaction-controls button').show();
+            $('#unmap-sections').text("Clear sections");
+            $('#next-section').focus();
+            stopScan();
+            break;
+        case "sectioning-off":
+            $('#interaction-controls button:not("#unmap-sections")').hide();
+            $('#unmap-sections').text("Interact with the Page");
+            $('#interaction-controls').focus();
+            stopScan();
+            break;   
+        case "bookmarked":
+            $("#add-bookmark").text("Remove Bookmark");
+            break;
+        case "not bookmarked":
+            $("#add-bookmark").text("Bookmark this Page");
+            break;            
+    }
+
 });

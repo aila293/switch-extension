@@ -1,5 +1,6 @@
 var background = chrome.extension.getBackgroundPage();
 
+// general functions
 function populateTabs(){
     var browser_tabs = background.browser_tabs;
     for (var i=0;i<browser_tabs.length;i++){
@@ -62,7 +63,7 @@ function changeTabHandler(e){
     }  
 }
 
-//purpose functions
+//purpose-specific functions
 
 function changeUrl(){
     document.title = "Enter new URL";
@@ -134,6 +135,11 @@ function getOptionsPage(){
     return options_page;
 }
 
+function setBookmark(){
+    // choose folder, option to type name of new folder
+    // type name of bookmark
+}
+
 // main switch
 var purpose;
 document.addEventListener('DOMContentLoaded', function() {
@@ -149,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             case 'changetab': changeTab(); break;
             case 'scankey': case 'selectkey': setKey(); break;
+            case 'bookmark': setBookmark();
         }
     });
     
