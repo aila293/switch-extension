@@ -513,10 +513,12 @@ function getDistanceBetweenEls(el1, el2){
 }
 
 function regainFocus(){   
-    if  ($('#keyboard-frame')[0].style.display == 'none'){
+    var keyboard = $('#keyboard-frame')[0];
+    
+    if  (keyboard.style.display == 'none'){
         chrome.runtime.sendMessage("panel focus"); 
-    } else {
-        chrome.runtime.sendMessage("keyboard focus");         
+    } else if (document.activeElement != keyboard){
+        chrome.runtime.sendMessage("keyboard focus");       
     } 
 }
 
@@ -535,11 +537,11 @@ window.addEventListener("message", function(event){
     
     if (event.origin.indexOf(my_origin) != -1){ 
         if (event.data[0] == "panel-height"){
-            $('#panel-frame').height(event.data[1]+5);
-            $('#panel-space-padding').height(event.data[1]+5);
+            $('#panel-frame').height(event.data[1]);
+            $('#panel-space-padding').height(event.data[1]);
         } else if (event.data[0] == "keyboard-height"){
-            $('#keyboard-frame').height(event.data[1]+5);
-            $('#panel-space-padding').height(event.data[1]+5);            
+            $('#keyboard-frame').height(event.data[1]);
+            $('#panel-space-padding').height(event.data[1]);            
         } else {
             
         switch(event.data){
@@ -558,7 +560,7 @@ window.addEventListener("message", function(event){
             case 'prev-section': moveSection(false); break;
             case 'back-section': backSection(); break;
             case 'unmap-sections': unmapDOM(); break;
-            case 'open': openKeyboard(); break;
+            case 'open-keyboard': openKeyboard(); break;
             case 'lost focus': regainFocus(); break;
             case 'back': window.history.back(); break;
             case 'forward': window.history.forward(); break;
@@ -577,9 +579,6 @@ window.addEventListener("message", function(event){
 /*  
 
 To do:        
-
-    - keyboard resizes, but not smaller (most apparent with words_div)
-
     - access iframes
     - inject into popups
     - fix http/https issue in url inputting (remove checking)

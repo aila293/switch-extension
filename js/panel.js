@@ -61,7 +61,7 @@ function processKeydown(e){
 function blurHandler(){
     window.setTimeout(function(){
         if (document.activeElement == document.body 
-            || $(':focus').length == 0) {   
+            || $(':focus').length == 0) {
             window.parent.postMessage("lost focus", "*");
             //routes to content script for page access, 
             //then to background to respond to this frame

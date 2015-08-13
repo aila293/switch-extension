@@ -37,7 +37,7 @@ function loadKeys(arr, name){
 
 function resetFocus(){ $('div:visible').first().focus(); }
 
-function updateLetters(){
+function updateCapitals(){
     var new_letters;
     if (caps_on){new_letters = capitals;}
     else { new_letters = letters; }
@@ -51,26 +51,24 @@ function toggleSymbols(){
     var symbols = $('#symbols_div');
     if (symbols.is(':visible')){
         symbols.hide();
-        $('#'+id).text("Show Numbers/Symbols");
-        adjustFrameHeight($(document).height()-150);
-        setTimeout(adjustFrameHeight, 50);
+        $("#toggle-symbols").text("Show Numbers/Symbols");
     } else {
         symbols.show();
-        $('#'+id).text("Hide Numbers/Symbols");
-        adjustFrameHeight();
+        $("#toggle-symbols").text("Hide Numbers/Symbols");
     }
+    adjustFrameHeight();
 }
 
 function processButton(id){
     switch(id){
         case 'caps':
             caps_on = !(caps_on);
-            updateLetters(); 
+            updateCapitals(); 
             $('#letters_div').focus();                  
             break;
-        case 'symbols':
+        case 'toggle-symbols':
             toggleSymbols();
-            symbols.focus();
+            $("#symbols_div").focus();
             break;
         case 'submit':
             $('#submit').focus();
@@ -129,14 +127,6 @@ function processKeydown(e){
                 if (div.id == 'letters_div' || text == "backspace"){
                     window.parent.postMessage(text, "*"); 
                     window.parent.postMessage("get-word", "*");
-                    
-                    var words_div = $("#words_div");
-                    if (!(words_div.is(":visible"))){
-                        words_div.show();
-                        adjustFrameHeight();
-                    }
-                    resetFocus();
-                    
                 } else if (div.id == "words_div") {
                     text = text.substring(current_word.length) + " ";
                     window.parent.postMessage(text, "*"); 
@@ -148,7 +138,7 @@ function processKeydown(e){
                 
                 if (caps_on){
                     caps_on=false;
-                    updateLetters();
+                    updateCapitals();
                 } 
                 stopScan();
                 break;
@@ -156,14 +146,16 @@ function processKeydown(e){
     }
 }
 
-function adjustFrameHeight(height){
-    if (!height) height = $(document).height();
+function adjustFrameHeight(){
     try { //if in the popup keyboard
         chrome.windows.getLastFocused(function(window){
             chrome.windows.update(window.id, {height: height+60});
         });
     } catch(e){ //if from the iframe
-        window.parent.postMessage(["keyboard-height", height], "*");      
+//        window.parent.postMessage(["keyboard-height", 100], "*");    
+//        setTimeout(function(){ //wait for height to change
+            window.parent.postMessage(["keyboard-height", $(document).height()], "*");
+//        }, 10)
     }
 }
 
@@ -188,21 +180,18 @@ function completeWord(str){
     
     if (word_predictions.length == 0){
         clearWords();
+    } else {
+        if (!(words_div.is(":visible"))){
+            words_div.show();
+        }
+        adjustFrameHeight();
     }
-    adjustFrameHeight();
+    resetFocus();
 }
 
 function clearWords(){
     $("#words_div").hide();
     $("#letters_div").focus();
-}
-
-function addWordSpaces(){
-    var words = document.getElementById("words_div");
-    for (var i=0;i<limit;i++){
-        var span = document.createElement("span");
-        words.appendChild(span);
-    }
 }
 
 var caps_on = false;
