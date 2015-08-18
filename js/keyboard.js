@@ -1,4 +1,8 @@
-var letters = ['e','t','a','o','i','n','s','h','r','d','l','u','c','m','f','w','y','p','v','b','g','k','j','q','x','z'];
+//var letters = ['e','t','a','o','i','n','s','h','r','d','l','u','c','m','f','w','y','p','v','b','g','k','j','q','x','z'];
+//most commonly used letters
+
+var letters = ["s", "a", "c", "m", "p", "r", "t", "b", "f", "g", "d", "l", "h", "i", "e", "n", "o", "w", "u", "v", "j", "k", "q", "y", "z", "x"];
+//most commonly used first letters in words
 
 var punctuation = ['space','backspace','new line',',','.',
                    '\'','\"','-','?','!',

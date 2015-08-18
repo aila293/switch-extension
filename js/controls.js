@@ -44,6 +44,7 @@ function injectMyStyles(){
     addStyle('.active-section .conceptual-sub-section', '{outline: solid mediumseagreen 3px;}'); 
     addStyle('.active-section', '{outline: solid orchid 5px !important;}');
     addStyle('.active-text-field', '{outline: solid orange 3px !important;}');
+    addStyle(".manually-created-section>a, .manually-created-section>li,", "{display: block;}");
 }
 
 function addStyle(selector, style_rules){ //strings
@@ -172,7 +173,9 @@ function getWord(){
 
 function isLetter(str,i){
     var code = str.charCodeAt(i);
-    return (code >= 65 && code <= 90) || (code >= 97 && code <= 122);  
+    return (code >= 65 && code <= 90) || (code >= 97 && code <= 122) || (code == 39);  
+    //39- apostrophe
+    //34- dash
 }
 
 /* SECTION MAPPING AND NAVIGATION */
@@ -289,11 +292,13 @@ function mapSection(section){  //marks sub-sections
         }
     });
     
+    //create sections to break up long sequences of the same element type
     var list_types = {TR: 0, A: 0, LI: 0};
     var start_of_list = {TR: 0, A: 0, LI: 0};
     var streak;
     sub_sections = $('.conceptual-sub-section');
     
+    //find sequences of the same element (table row, link, or list item)
     sub_sections.each(function(index){
         var tag = this.tagName;
             
@@ -327,7 +332,8 @@ function mapSection(section){  //marks sub-sections
                 filtered.filter(function(index){
                     return (index >= first
                    && index < first+step);
-                }).removeClass('conceptual-sub-section').wrapAll("<div class='conceptual-sub-section'></div>");
+                }).removeClass('conceptual-sub-section').
+                wrapAll("<div class='conceptual-sub-section manually-created-section'></div>");
                 first +=step;
             }
         }
@@ -580,25 +586,21 @@ window.addEventListener("message", function(event){
 
 To do:        
     - access iframes
+    - find better way to adapt keyboard to a smaller size
     - inject into popups
-    - fix http/https issue in url inputting (remove checking)
+    - fix http/https issue in url inputting (remove checking?)
+    - reformat radio buttons/inputs like my options page
+    - creation of page-specific buttons
     - improve formatting- esp. popups, keyboard 
     - refactor/clarify/document/diagram code 
-    
-To do later:
-    - more bookmarking features (choosing names, parent folders)
-    - reformat radio buttons/inputs ~my options page
-    -creation of page-specific buttons
-    
+
+
 To do maybe:
     -better autoscan (delay in beginning of section, different times for sections vs single elements)?
     -other controls (window snapping, volume controls)
+    -more bookmarking features (names, folders)
     -connect "search" function with link selection
     -alternative keyboards
-    
-Considerations:
-    - include hyphens, apostrophes in "isLetter"?
-    - manually created sub-sections can mess up styling 
     - adapt word completion by incrementing frequencies?   
 
 https://object.io/site/2011/enter-git-flow/
