@@ -55,7 +55,7 @@ function processKeydown(e){
             startScan(); 
         } else {
             switch(target.tagName){
-                case 'A': target.click(); break;
+                case 'A': target.click(); stopScan(); break;
                 case 'BUTTON': stopScan(); processButton(target.id); break;
                 default: resetTime(); $(target).children().first().focus();
             } 

@@ -189,6 +189,7 @@ window.addEventListener("message", function(event){
             //do nothing, no word completion
             break;
         default:
-            typeToInput(event.data);                
+            typeToInput(event.data);   
+            $("#letters_div").children().first().focus();
     }
 });  

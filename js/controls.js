@@ -68,11 +68,12 @@ function openKeyboard(){
 
     //if no active field, find the first visible text field
     if (active_field.length == 0){ 
-        var txt_index = 0;
-        while (!( $(inputs[txt_index]).is(':visible'))){
-            txt_index++;
+        for (var i=0;i<inputs.length;i++){
+            if ($(inputs[i]).is(':visible')){
+                break;
+            }
         }
-        $(inputs[txt_index]).addClass('active-text-field');
+        $(inputs[i]).addClass('active-text-field');
     } 
         
     //display the keyboard
@@ -81,8 +82,9 @@ function openKeyboard(){
         keyboard.show();
         $("#panel-space-padding").height(keyboard.height());
     }
+
     chrome.runtime.sendMessage("keyboard focus");
-    
+
     scrollToView($('.active-text-field'));
 }
 

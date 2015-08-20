@@ -89,7 +89,7 @@ function showFocusStyle(scanning){
     if (scanning){
         document.querySelector("#focus-style").innerText = ":focus {border: solid red 3px !important;}";
     } else {
-        document.querySelector("#focus-style").innerText =  ":focus {border: solid lightblue 1px !important;}";
+        document.querySelector("#focus-style").innerText =  ":focus {border: solid lightblue 1px !important;} input[type='radio']:focus{border: solid lightblue 3px !important;}";
     }
 }
 

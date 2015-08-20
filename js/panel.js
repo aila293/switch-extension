@@ -80,9 +80,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setUpNavigation();
     setFirstSectionFocus();
     $('*').blur(blurHandler);
-});
-
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
+    
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
     switch(message){
         case "panel focus":
             setFirstSectionFocus(); 
@@ -106,5 +105,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { /
             $("#add-bookmark").text("Bookmark this Page");
             break;            
     }
+});
 
 });
+

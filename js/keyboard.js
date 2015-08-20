@@ -201,8 +201,13 @@ function clearWords(){
 var caps_on = false;
 document.addEventListener('DOMContentLoaded', function() {
     loadKeys(letters, "letters");
-    loadKeys(punctuation, "punctuation");
+    loadKeys(punctuation, "punctuation");    
     loadKeys(symbols, "symbols");    
+    
+    var titled_keys = $("#punctuation1").children();
+    for (var i=0;i<3;i++){
+        titled_keys[i].className = "titled_key";
+    }
     $('div,section,span,button').each(function(index,element){
         this.tabIndex = index;
     });
@@ -213,13 +218,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, processKeydown);
     
-});
-
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    if (message == 'keyboard focus'){
-        adjustFrameHeight();
-        resetFocus(); 
-    } else {
-        completeWord(message);
+    chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+        if (message == 'keyboard focus'){
+            adjustFrameHeight();
+            resetFocus(); 
+        } else {
+            completeWord(message);
     }
 });
+
+});
+
