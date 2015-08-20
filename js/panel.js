@@ -7,6 +7,8 @@ function setTabIndex(){
 
 function setFirstSectionFocus(){
     $('section').first().focus();
+    window.setTimeout(function(){blur_handler_on = true;}, 1000);
+
 }
 
 function setUpNavigation(){
@@ -58,16 +60,22 @@ function processKeydown(e){
     }        
 }
 
+var blur_handler_on=true;
 function blurHandler(){
+    if (!blur_handler_on) return;
+    
+    blur_handler_on = false;
     window.setTimeout(function(){
-        if (document.activeElement == document.body 
-            || $(':focus').length == 0) {
-            window.parent.postMessage("lost focus", "*");
-            //routes to content script for page access, 
-            //then to background to respond to this frame
-        } 
-    }, 300); //wait for the new element to get the focus
+
+    if (document.activeElement == document.body
+        || $(':focus').length == 0){
+        window.parent.postMessage("lost focus", "*");
+        //routes to content script for page access, 
+        //then to background to respond to this frame
+    } 
+    }, 1000);
 }
+
 
 document.addEventListener('DOMContentLoaded', function() {
 
@@ -79,11 +87,13 @@ document.addEventListener('DOMContentLoaded', function() {
     setTabIndex();
     setUpNavigation();
     setFirstSectionFocus();
-    $('*').blur(blurHandler);
+    $('body div, body section, body span').blur(blurHandler);
     
     chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) { //from background
     switch(message){
         case "panel focus":
+            console.log("panel focus");
+            console.log(document.activeElement);
             setFirstSectionFocus(); 
             break;
         case "sectioning-on":

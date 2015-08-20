@@ -87,9 +87,10 @@ function resetTime(){
 
 function showFocusStyle(scanning){
     if (scanning){
-        document.querySelector("#focus-style").innerText = ":focus {border: solid red 3px !important;}";
+        document.querySelector("#focus-style").innerText = ":focus {border: solid #B53535 3px !important; outline: none;} #words_div span:focus {border: none !important; color: #E02828; font-weight:600}";
     } else {
-        document.querySelector("#focus-style").innerText =  ":focus {border: solid lightblue 1px !important;} input[type='radio']:focus{border: solid lightblue 3px !important;}";
+        document.querySelector("#focus-style").innerText =  ":focus {border: solid rgb(110, 162, 199) 3px;} ";
     }
 }
 
+//input[type='radio']:focus{border: solid rgb(82, 162, 218) 4px;  outline: none;}

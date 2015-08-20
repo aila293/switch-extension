@@ -39,7 +39,7 @@ function openPopup(purpose){
             chrome.windows.create({'url': 'popup-keyboard.html?find', 'width': 700, 'height': 300, 'type': 'popup'}, function(window) {}); 
             break;
         case 'change-url':
-            chrome.windows.create({'url': 'popup-keyboard.html?changeurl', 'width': 600, 'height': 400,'type': 'popup'}, function(window) {});
+            chrome.windows.create({'url': 'popup-keyboard.html?changeurl', 'width': 750, 'height': 300,'type': 'popup'}, function(window) {});
             break;
         case 'bookmark':
             chrome.windows.create({'url': 'popup-keyboard.html?bookmark', 'width': 600, 'height': 400,'type': 'popup'}, function(window) {});

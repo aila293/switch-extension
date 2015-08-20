@@ -1,5 +1,12 @@
 
 
+// generic "find next of tag"
+            var all_sections = $( "section:visible" );
+            var i = all_sections.index( e.target ) ;
+            var next = all_sections[++i];
+            if (i== all_sections.length){i=0;} //rollover
+            $(all_sections[i]).focus();   
+
 
 //PredictKey testing
 $.post("http://api.predictkey.com/predict",

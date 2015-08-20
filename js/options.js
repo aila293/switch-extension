@@ -6,7 +6,7 @@ function saveOptions(event) {
     var newtab_option = $('input[name="newtab-page"]:checked');
     var url = newtab_option.val();
     if (url == 'other'){
-        url = $('#custom-url').val(); 
+        url = $('#custom-url').text(); 
     } else if (url == "bookmarks"){
         url = chrome.extension.getURL("bookmarks.html");
     }
@@ -64,7 +64,7 @@ function restoreOptions() {
 
         $('input[name="newtab-page"]')[items.newtab_index].checked=true;
         if ($("input[value='other']")[0].checked){
-            $("#custom-url").val(items.newtab_url);
+            $("#custom-url").text(items.newtab_url);
         }
     });
 }
@@ -77,15 +77,20 @@ function processKeydown(e){
         startScan();
     } else {
         
-    var section = e.target.tagName == 'SECTION';
+    var isSection = e.target.tagName == 'SECTION';
         
     if (e.which == settings.scan_code){
-        if (section){
-            var all_sections = $( "section:visible" );
-            var i = all_sections.index( e.target ) ;
-            var next = all_sections[++i];
-            if (i== all_sections.length){i=0;} //rollover
-            $(all_sections[i]).focus();                    
+        if (isSection){   
+            //not secure if more than one hidden element in a row
+            var next = $(e.target).next();
+            if (! next.is(":visible")){
+                next = next.next();
+            }
+            
+            if (next.length==0) {
+                next = $("section:visible").first();
+            }
+            next.focus();
         } else {
             var index = $("input:visible, button:visible").index(e.target);
             var next = $("input:visible, button:visible")[index+1];
@@ -100,7 +105,7 @@ function processKeydown(e){
         }
 
     } else if (e.which == settings.select_code){
-        if (section){
+        if (isSection){
             var inputs = $(e.target).find('input,button');
             if (inputs.length == 1){
                 inputs[0].click();
@@ -191,7 +196,7 @@ window.addEventListener("message", function(event){
             $('span.select').text(keyCodeMap[event.data[1]]+ "  ");
             break;
         case "newtab-url":
-            $('#custom-url').val(event.data[1]);
+            $('#custom-url').text(event.data[1]);
             break;
     }
 });

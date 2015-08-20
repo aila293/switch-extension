@@ -5,14 +5,24 @@
     <style>
         body {
             word-wrap: break-word;
+            background-color: #B5BBBB;
             overflow: hidden;
         }
         section {
             display: inline-block;
             margin-right: 70px;
+            margin-bottom: 10px;
         }
         #interaction-controls button:not(#unmap-sections){
             display: none;
+        }
+        button {
+            padding: 4px 8px;
+            margin-right: 5px;
+            font-family: verdana;
+        }
+        .last {
+            margin-right: 0px;
         }
     </style>
     
@@ -28,7 +38,7 @@
         <button id='down'>Scroll Down</button>
         <button id='up'>Scroll Up</button>
         <button id='bottom'>Scroll to Bottom</button>
-        <button id='top'>Scroll to Top</button>
+        <button id='top' class = "last">Scroll to Top</button>
     </section>
 
     <section id= 'interaction-controls'>
@@ -36,7 +46,7 @@
         <button id='select-section'> Select Section </button>
         <button id='prev-section'> Previous Section </button>
         <button id='back-section'> Go Up a Level </button>
-        <button id='unmap-sections'> Interact with the Page </button>
+        <button id='unmap-sections' class = "last"> Interact with the Page </button>
     </section>
     
     <section id='page-controls'>
@@ -44,14 +54,14 @@
         <button id='new-tab'> New Tab </button>
         <button id='close-tab'> Close Tab </button>
         <button id='change-tab'> Change Tab </button>
-        <button id='change-url'>Navigate to URL</button>
+        <button id='change-url' class = "last">Navigate to URL</button>
     </section>
     
     <section>
         <button id='open-keyboard'>Open Keyboard</button>
         <button id="bookmarks"> View Bookmarks </button>
         <button id="add-bookmark"> Bookmark this Page </button>
-        <button id='settings'> Extension Settings </button>
+        <button id='settings' class = "last"> Extension Settings </button>
     </section>
     
     <section id='other-controls'>
@@ -59,7 +69,7 @@
         <button id='forward'> Forward a Page </button>
         <button id='find'> Search the Page </button>
        <button id='zoom-in'> Zoom In </button>
-        <button id='zoom-out'> Zoom Out </button>
+        <button id='zoom-out' class = "last"> Zoom Out </button>
     </section>
     
 <!--

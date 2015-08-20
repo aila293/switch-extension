@@ -5,23 +5,33 @@
     <style>
         body {
             word-wrap: break-word;
+            background-color: #B5BBBB;
         }
         span {
             font-size: 22px;
             display: inline-block;
             height: 30px;
-            min-width: 30px;
-            width: auto;
-            border: solid black;
+            min-width: 35px;
             text-align: center;
             margin: 1px;
+            font-weight: 400;
+            font-family: verdana;
+            background-color: #3D3E42;
+            color: white;
         }
         span:focus {
-            color: red;
-            border: solid black !important;
             outline: none !important;
+            background-color: #B53535;
         }
-        
+        :focus {
+            outline: none;
+            border: solid #B53535 3px;
+        }
+        button {
+            padding: 4px 8px;
+            margin-right: 10px;
+            font-family: Verdana;
+        }       
         div {
             margin-top: 5px;
             margin-bottom: 5px;
@@ -39,6 +49,9 @@
         }
         .last{
             margin-right: 0px;
+        }
+        .titled_key{
+            padding: 0px 5px 0px 5px;
         }
     </style>
     

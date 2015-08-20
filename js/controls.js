@@ -82,9 +82,7 @@ function openKeyboard(){
         keyboard.show();
         $("#panel-space-padding").height(keyboard.height());
     }
-
     chrome.runtime.sendMessage("keyboard focus");
-
     scrollToView($('.active-text-field'));
 }
 
@@ -588,14 +586,23 @@ window.addEventListener("message", function(event){
 
 To do:        
     - access iframes
-    - find better way to adapt keyboard to a smaller size
     - inject into popups
     - fix http/https issue in url inputting (remove checking?)
     - reformat radio buttons/inputs like my options page
     - creation of page-specific buttons
-    - improve formatting- esp. popups, keyboard 
-    - refactor/clarify/document/diagram code 
+    
+Potential focus issues, on watch:
+    - sometimes closeKeyboard doesn't put focus in panel
+    - sometimes lost focus (e.g. Google.com, clicking) doesn't return
 
+Smaller issues:
+    - show message if no text field found in openKeyboard
+    - changeTab popup overflow:hidden
+    - find better way to adapt keyboard to a smaller size
+
+General issues:
+    - improve formatting- esp. popups, keyboard 
+    - refactor/clarify/document/diagram code  
 
 To do maybe:
     -better autoscan (delay in beginning of section, different times for sections vs single elements)?

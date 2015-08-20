@@ -7,6 +7,11 @@
             font-size: 18px;
             line-height: 40px;
         }
+        section {
+            float:left;
+            clear:both;
+            margin-bottom: 20px;
+        }
     </style>
     
     <script src="js/autoscan.js"></script>  
@@ -28,10 +33,10 @@
         <button id='increase'> Increase </button>
         <button id='decrease'> Decrease </button>
         
-    </section> <br>
+    </section>
     
     <section>
-        Switch Interface Inputs: <br>
+        Switch Interface Inputs:
         <div class='scan'> 
             'Scan' input: 
             <span class='scan'></span>
@@ -42,20 +47,20 @@
             <span class='select'></span> 
             <button class= 'select set'> Set </button> 
         </div>
-    </section> <br>
+    </section>
     
     <section>
        "New Tab" Page: <br>
          <input type="radio" name="newtab-page" value="https://www.google.com"> Google.com <br>
         <input type="radio" name="newtab-page" value="bookmarks"> Bookmarks Page <br>
         <input type="radio" name="newtab-page" value="chrome://newtab"> Chrome's default "New Tab" page (not recommended) <br>
-        <input type="radio" name="newtab-page" value="other"> Other URL: <input id='custom-url' size='40'>  
-    </section> <br>
+        <input type="radio" name="newtab-page" value="other"> Other URL: <em><span id='custom-url'></span></em>  
+    </section>
         
     <section>
         <input type="submit" name="save" id='save'>
         <span id='status'></span>
-    </section> <br>
+    </section>
     
     <section>
         <button id='exit'>Close this page</button>

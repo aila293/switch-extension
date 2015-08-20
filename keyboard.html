@@ -5,41 +5,47 @@
     <style>
         body {
             word-wrap: break-word;
+            background-color: #B5BBBB;
+            overflow: hidden;
         }
         span {
             font-size: 22px;
             display: inline-block;
             height: 30px;
-            min-width: 30px;
-            width: auto;
-            border: solid black;
+            min-width: 35px;
             text-align: center;
             margin: 1px;
-        }
-        #words_div span {
-            border: none;
-            margin-right: 20px;
-        }
-        #words_div section {
-/*            border-right: solid black;*/
+            font-weight: 400;
+            font-family: verdana;
+            background-color: #3D3E42;
+            color: white;
         }
         span:focus{
             outline: none !important;
-            color: red;
-            border: solid black !important;
+            background-color: #B53535;
         }
-        #words_div span:focus {
-            color: black;
-            border: solid red !important;
+        :focus {
+            outline: none;
+            border: solid #B53535 3px;
+        }
+        button {
+            padding: 4px 8px;
+            margin-right: 10px;
+            font-family: Verdana;
         }
         div {
-            margin-top: 5px;
+            float:left;
+            clear:both;
             margin-bottom: 5px;
         }
-        #buttons_div{
-            margin-bottom: 0px;
+        #words_div span {
+            background: none;
+            margin-right: 20px;
+            color:black;
         }
-        
+        #words_div span:focus {
+        }
+
         section{
             display: inline-block;
             margin: 2px 15px 2px 0px;
@@ -78,7 +84,7 @@
         <button id='caps'>Capital Letters</button>
         <button id='toggle-symbols'>Show Numbers/Symbols</button>
         <button id='clear'>Clear this field</button> 
-        <button id='close'>Close Keyboard</button>
+        <button id='close' class="last">Close Keyboard</button>
     </div>
 
 </body>

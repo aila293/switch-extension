@@ -135,11 +135,6 @@ function getOptionsPage(){
     return options_page;
 }
 
-function setBookmark(){
-    // choose folder, option to type name of new folder
-    // type name of bookmark
-}
-
 // main switch
 var purpose;
 document.addEventListener('DOMContentLoaded', function() {
@@ -155,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
             case 'changetab': changeTab(); break;
             case 'scankey': case 'selectkey': setKey(); break;
-            case 'bookmark': setBookmark();
         }
     });
     
